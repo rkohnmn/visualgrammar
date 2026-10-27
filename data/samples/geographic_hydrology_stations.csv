@@ -1,0 +1,17 @@
+station_code,basin_group,latitude,longitude,population_k,withdrawal_mld,drought_stress_rate
+US-WA,Pacific NW,47.61,-122.33,2450,680,14.2
+US-OR,Pacific NW,45.52,-122.68,1820,510,18.5
+US-CA-N,Pacific SW,37.77,-122.42,4600,1420,58.4
+US-CA-S,Pacific SW,34.05,-118.24,9800,3150,76.2
+US-AZ,Colorado Basin,33.45,-112.07,4950,1890,84.5
+US-NV,Colorado Basin,36.17,-115.14,2290,840,88.1
+US-CO,Colorado Basin,39.74,-104.99,2900,920,62
+US-UT,Colorado Basin,40.76,-111.89,1450,530,71.4
+US-TX,Gulf & Plains,29.76,-95.37,7100,2480,49.8
+US-KS,Gulf & Plains,37.69,-97.34,680,310,64.2
+US-MN,Great Lakes & Upper MS,44.98,-93.27,2950,810,22.4
+US-IL,Great Lakes & Upper MS,41.88,-87.63,8900,2740,19.6
+US-MI,Great Lakes & Upper MS,42.33,-83.05,3500,1080,16.8
+US-PA,Atlantic Basin,40.6,-75.49,860,265,21
+US-NY,Atlantic Basin,40.71,-74.01,12400,3790,24.5
+US-GA,Atlantic Basin,33.75,-84.39,5100,1620,38.2

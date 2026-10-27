@@ -1,0 +1,9 @@
+trial_center,region,sample_size,point_estimate,se,ci95_low,ci95_high,pred95_low,pred95_high
+Boston Med,North America,140,18.4,2.1,14.28,22.52,-6.4,43.2
+Toronto Gen,North America,95,16.9,2.6,11.8,22,-8.1,41.9
+Seattle Inst,North America,110,20.1,2.4,15.4,24.8,-4.9,45.1
+Zurich Univ,Europe,165,19.2,1.9,15.48,22.92,-5.2,43.6
+Uppsala Clin,Europe,80,15.5,2.9,9.82,21.18,-10.4,41.4
+Munich Lab,Europe,130,17.8,2.2,13.49,22.11,-7.1,42.7
+Osaka Metro,Asia-Pacific,150,21,2,17.08,24.92,-3.6,45.6
+Melbourne Ctr,Asia-Pacific,105,18.1,2.5,13.2,23,-7.2,43.4

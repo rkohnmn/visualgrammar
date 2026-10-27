@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="VisualGrammar — An interactive statistical laboratory for understanding data types, discovering visualizations, building accurate charts, and learning how graphical representations communicate information.">
+  <title>VisualGrammar — Understand the Data. Choose the View. Reveal the Story.</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%230f766e'/><path d='M7 23 L13 14 L18 19 L25 9' stroke='white' stroke-width='2.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/><circle cx='25' cy='9' r='2' fill='%2338bdf8'/></svg>">
+  <link rel="stylesheet" href="./css/tokens.css">
+  <link rel="stylesheet" href="./css/base.css">
+  <link rel="stylesheet" href="./css/components.css">
+  <link rel="stylesheet" href="./css/print.css">
+</head>
+<body>
+  <a href="#main-workspace" class="skip-link">Skip to main workspace</a>
+
+  <!-- DataSense Ecosystem Bar (Part 18.1) -->
+  <div class="ecosystem-bar no-print" role="navigation" aria-label="DataSense Studio Ecosystem Navigation">
+    <div class="ecosystem-links">
+      <span class="eco-item"><strong>DataSense Studio Ecosystem:</strong></span>
+      <a href="#view-home" data-eco-link="studio" title="DataSense Studio Hub">DataSense Studio</a>
+      <a href="https://rkohnmn.github.io/quartetlab/" target="_blank" rel="noopener noreferrer" title="QuartetLab — Bivariate OLS, Diagnostics &amp; Exact-Moment Solver">QuartetLab ↗</a>
+      <span class="eco-item eco-active" aria-current="page">● VisualGrammar (v1.0.0)</span>
+      <span class="eco-item" title="ResampleLab — Compatible via DataSenseSimulationResult JSON">ResampleLab (Interoperable)</span>
+      <span class="eco-item" title="ForecastLab — Compatible via DataSenseForecastResult JSON">ForecastLab (Interoperable)</span>
+    </div>
+    <div class="ecosystem-links">
+      <span class="badge badge-primary" id="privacy-status-badge" title="100% Client-Side Processing — Zero External Telemetry">Local-First Privacy: Active</span>
+    </div>
+  </div>
+
+  <!-- Sticky Instrument Header & Primary Navigation -->
+  <header class="instrument-header" role="banner">
+    <div class="header-inner">
+      <div class="header-top-row">
+        <div class="brand-cluster">
+          <a href="#view-home" class="brand-title" id="brand-home-link">VisualGrammar</a>
+          <span class="brand-badge">v1.0.0</span>
+          <span class="brand-tagline">Understand the data. Choose the view. Reveal the story.</span>
+        </div>
+
+        <div class="global-controls" role="toolbar" aria-label="Global Dataset, Explanation Depth, and Theme Controls">
+          <div class="form-group" style="min-width: 245px;">
+            <label for="global-preset-select" class="sr-only">Active Dataset</label>
+            <select id="global-preset-select" aria-label="Select Built-In Sample Dataset">
+              <!-- Populated by app.js -->
+            </select>
+          </div>
+
+          <button type="button" class="btn btn-sm" id="btn-open-upload-modal" title="Upload CSV, TSV, DataSense JSON, or Paste Table">
+            ↑ Import Data
+          </button>
+
+          <!-- Progressive Explanation Level Switcher (Part 3.5) -->
+          <div class="segmented-control" role="group" aria-label="Explanation Complexity Level">
+            <button type="button" class="segmented-btn" data-exp-level="simple" aria-pressed="false" title="Plain-language explanations with concrete examples">Simple</button>
+            <button type="button" class="segmented-btn active" data-exp-level="standard" aria-pressed="true" title="Statistical interpretation, data-type terminology, and qualifications">Standard</button>
+            <button type="button" class="segmented-btn" data-exp-level="technical" aria-pressed="false" title="Mathematical definitions, formulas, and algorithmic details">Technical</button>
+          </div>
+
+          <button type="button" class="btn btn-sm" id="btn-toggle-theme" aria-label="Toggle Light Archival or Dark Instrument Theme">
+            ◐ Theme
+          </button>
+        </div>
+      </div>
+
+      <!-- 9 Main Application Destinations (Part 5) -->
+      <nav class="nav-bar" role="tablist" aria-label="VisualGrammar Primary Destinations">
+        <button type="button" class="nav-tab active" role="tab" aria-selected="true" data-view="home" id="tab-home">1. Home &amp; Workbench</button>
+        <button type="button" class="nav-tab" role="tab" aria-selected="false" data-view="understand" id="tab-understand">2. Understand Data</button>
+        <button type="button" class="nav-tab" role="tab" aria-selected="false" data-view="recommend" id="tab-recommend">3. Find a Visualization</button>
+        <button type="button" class="nav-tab" role="tab" aria-selected="false" data-view="studio" id="tab-studio">4. Chart Studio</button>
+        <button type="button" class="nav-tab" role="tab" aria-selected="false" data-view="unity" id="tab-unity">5. Known Visualization Unity</button>
+        <button type="button" class="nav-tab" role="tab" aria-selected="false" data-view="atlas" id="tab-atlas">6. Visualization Atlas</button>
+        <button type="button" class="nav-tab" role="tab" aria-selected="false" data-view="literacy" id="tab-literacy">7. Chart Literacy Lab</button>
+        <button type="button" class="nav-tab" role="tab" aria-selected="false" data-view="learn" id="tab-learn">8. Learn</button>
+        <button type="button" class="nav-tab" role="tab" aria-selected="false" data-view="about" id="tab-about">9. About &amp; Methods</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Application Workspace -->
+  <main id="main-workspace" class="app-container" role="main">
+
+    <!-- =====================================================================
+         DESTINATION 1: HOME & QUICK-ENTRY WORKBENCH (Part 5.1)
+         ===================================================================== -->
+    <section id="view-home" class="view-section active" aria-labelledby="tab-home">
+      <div class="bento-2col">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h1 class="card-title" style="font-size: 24px;">VisualGrammar Laboratory</h1>
+              <p class="card-subtitle">Map observational units and statistical meaning to accurate visual geometry.</p>
+            </div>
+            <span class="badge badge-primary" id="home-active-dataset-badge">Active Dataset Ready</span>
+          </div>
+
+          <details class="collapsible-panel">
+            <summary>Core Product Philosophy &amp; 10-Dimension Mapping</summary>
+            <div class="collapsible-body">
+              <p id="home-philosophy-text" style="margin:0;">
+                Different charts can represent the exact same observations while emphasizing different mathematical properties. Conversely, two charts that look visually similar may encode fundamentally different statistical quantities (such as raw data spread vs. a 95% confidence interval).
+              </p>
+            </div>
+          </details>
+
+          <div class="bento-3col">
+            <div class="card card-compact" style="background: var(--color-surface-elevated);">
+              <h3>Pillar A: Understand Data</h3>
+              <p class="card-subtitle">19-type inference, summaries &amp; transforms.</p>
+              <button type="button" class="btn btn-primary btn-sm" data-goto-view="understand">Inspect Variables →</button>
+            </div>
+            <div class="card card-compact" style="background: var(--color-surface-elevated);">
+              <h3>Pillar B: Find a View</h3>
+              <p class="card-subtitle">Rule-based chart discovery &amp; trade-offs.</p>
+              <button type="button" class="btn btn-primary btn-sm" data-goto-view="recommend">Explore Recommendations →</button>
+            </div>
+            <div class="card card-compact" style="background: var(--color-surface-elevated);">
+              <h3>Pillar C: Chart Studio</h3>
+              <p class="card-subtitle">Interactive builder, audit &amp; exports.</p>
+              <button type="button" class="btn btn-primary btn-sm" data-goto-view="studio">Open Chart Studio →</button>
+            </div>
+            <div class="card card-compact" style="background: var(--color-surface-elevated);">
+              <h3>Pillar D: Visualization Unity</h3>
+              <p class="card-subtitle">16 multi-view structural transformations.</p>
+              <button type="button" class="btn btn-sm" data-goto-view="unity">Explore Unity Lab →</button>
+            </div>
+            <div class="card card-compact" style="background: var(--color-surface-elevated);">
+              <h3>Pillar E: Chart Literacy Lab</h3>
+              <p class="card-subtitle">15 distortion repairs &amp; 7 challenges.</p>
+              <button type="button" class="btn btn-sm" data-goto-view="literacy">Enter Literacy Lab →</button>
+            </div>
+            <div class="card card-compact" style="background: var(--color-surface-elevated);">
+              <h3>Pillar F: Knowledge Atlas</h3>
+              <p class="card-subtitle">34 chart specs &amp; 26 concept lessons.</p>
+              <button type="button" class="btn btn-sm" data-goto-view="atlas">Open Visualization Atlas →</button>
+            </div>
+          </div>
+
+          <div class="card-header" style="margin-top: 2px;">
+            <h3>Immediate Data Entry &amp; Local Session</h3>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button type="button" class="btn btn-primary btn-sm" id="home-btn-upload">Upload CSV / TSV / JSON</button>
+              <button type="button" class="btn btn-sm" id="home-btn-restore-recent">Restore Recent Local Work</button>
+              <button type="button" class="btn btn-sm" id="home-btn-clear-local">Clear Stored Data</button>
+            </div>
+          </div>
+          <div id="home-recent-status" class="card-subtitle">100% client-side browser execution — zero external network calls.</div>
+        </div>
+
+        <!-- Immediate Live Preview Workbench on Home -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title" id="home-preview-title">Live Dataset Preview</h2>
+              <p class="card-subtitle" id="home-preview-subtitle">Interact directly or jump into Chart Studio for full controls.</p>
+            </div>
+            <button type="button" class="btn btn-primary btn-sm" data-goto-view="studio">Customize in Studio →</button>
+          </div>
+          <div class="canvas-container compact-canvas">
+            <canvas id="home-preview-canvas" width="620" height="260" aria-label="Home live preview chart canvas"></canvas>
+            <div id="home-preview-tooltip" class="chart-tooltip" style="display:none;"></div>
+          </div>
+          <div id="home-preview-summary" class="callout"></div>
+        </div>
+      </div>
+
+      <!-- 17 Curated Sample Datasets Catalog (Collapsible) -->
+      <div class="card">
+        <details class="collapsible-panel" open>
+          <summary>Built-In Sample Datasets &amp; Statistical Structures (17 Presets — Click to Expand/Collapse)</summary>
+          <div class="collapsible-body">
+            <div id="home-presets-grid" class="bento-3col">
+              <!-- Populated dynamically by app.js -->
+            </div>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         DESTINATION 2: UNDERSTAND DATA (Part 5.2 & Part 6)
+         ===================================================================== -->
+    <section id="view-understand" class="view-section" aria-labelledby="tab-understand">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h1 class="card-title" id="understand-dataset-title">Dataset Inspection &amp; Variable Taxonomy</h1>
+            <p class="card-subtitle" id="understand-dataset-desc"></p>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <span class="badge badge-info" id="understand-provenance-badge">Provenance</span>
+            <button type="button" class="btn btn-sm" id="understand-btn-upload">↑ Upload / Paste New Dataset</button>
+            <button type="button" class="btn btn-primary btn-sm" data-goto-view="recommend">Next: Find a Visualization →</button>
+          </div>
+        </div>
+
+        <div class="metric-grid" id="understand-summary-metrics">
+          <!-- Populated by app.js -->
+        </div>
+      </div>
+
+      <!-- Variable Classification & Manual Override Table (Part 6.3 & 6.4) -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">Variable Classification &amp; Semantic Overrides</h2>
+            <p class="card-subtitle">Override any inferred statistical type below to update chart recommendations and integrity rules.</p>
+          </div>
+          <button type="button" class="btn btn-sm" id="btn-reset-type-overrides">Reset Type Overrides</button>
+        </div>
+        <div class="table-scroll">
+          <table class="data-table" id="variable-profile-table" aria-label="Variable Taxonomy and Summary Statistics">
+            <thead>
+              <tr>
+                <th>Variable</th>
+                <th>Semantic Type (Override)</th>
+                <th>Storage</th>
+                <th>Confidence &amp; Rationale</th>
+                <th class="numeric">Valid / Missing</th>
+                <th class="numeric">Unique</th>
+                <th>Summary Statistics / Top Categories / Range</th>
+                <th>Unit</th>
+              </tr>
+            </thead>
+            <tbody id="variable-profile-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Safe, Non-Destructive Data Transformation Engine (Part 6.5) -->
+      <div class="bento-2col">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">Non-Destructive Transformations</h2>
+              <p class="card-subtitle">Derive columns, filter, or bin without overwriting raw observations.</p>
+            </div>
+            <div style="display:flex; gap:6px;">
+              <button type="button" class="btn btn-sm" id="btn-transform-undo" title="Undo last transformation">↶ Undo</button>
+              <button type="button" class="btn btn-sm" id="btn-transform-redo" title="Redo transformation">↷ Redo</button>
+              <button type="button" class="btn btn-sm" id="btn-transform-reset" title="Reset to original raw dataset">Reset All</button>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="transform-type-select">Transformation Operation</label>
+              <select id="transform-type-select">
+                <option value="sort">Sort Observations</option>
+                <option value="filter">Filter Observations (Keep Matching)</option>
+                <option value="standardize_z">Standardize to Z-Scores ((x - x̄)/s)</option>
+                <option value="log_transform">Logarithmic Transform (ln or log10)</option>
+                <option value="binning">Discretize / Equal-Width Binning</option>
+                <option value="cumulative_total">Cumulative Running Total</option>
+                <option value="date_extract">Extract Year or Month from Date</option>
+                <option value="derived_expression">Derived Arithmetic Column (A op B)</option>
+                <option value="rename_variable">Rename Variable</option>
+                <option value="group_aggregate">Group &amp; Aggregate Table</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="transform-col-a">Target Variable</label>
+              <select id="transform-col-a"></select>
+            </div>
+            <div class="form-group" id="transform-param-group">
+              <label for="transform-param-label" id="transform-param-label">Parameter / Direction</label>
+              <input type="text" id="transform-param-input" value="asc" placeholder="e.g., asc, desc, > 50">
+            </div>
+            <div class="form-group" id="transform-col-b-group" style="display:none;">
+              <label for="transform-col-b">Secondary Variable / Target</label>
+              <select id="transform-col-b"></select>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+            <button type="button" class="btn btn-primary btn-sm" id="btn-apply-transform">+ Apply Transformation Step</button>
+            <span class="card-subtitle" id="transform-feedback-msg">0 active transformation steps applied.</span>
+          </div>
+
+          <details class="collapsible-panel">
+            <summary>Transformation Provenance Log</summary>
+            <div class="collapsible-body">
+              <div id="transform-provenance-list" class="callout" style="margin-top:0;">
+                <strong>Provenance Log:</strong> Original imported dataset active (no transformations applied).
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <!-- Accessible Data Preview, Search, & Interactive Manual Table Editing (Part 6.1) -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">Dataset Preview &amp; Inline Cell Editor</h2>
+              <p class="card-subtitle">Double-click any cell to edit values directly.</p>
+            </div>
+            <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+              <button type="button" class="btn btn-sm" id="btn-add-observation-row">+ Add Observation Row</button>
+              <label for="data-preview-search" class="sr-only">Filter preview rows</label>
+              <input type="search" id="data-preview-search" placeholder="Search rows..." style="width:145px;">
+            </div>
+          </div>
+          <div class="table-scroll" style="max-height: 320px;">
+            <table class="data-table" id="data-preview-table" aria-label="Dataset Observation Preview">
+              <thead id="data-preview-thead"></thead>
+              <tbody id="data-preview-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         DESTINATION 3: FIND A VISUALIZATION (Part 5.3 & Part 7)
+         ===================================================================== -->
+    <section id="view-recommend" class="view-section" aria-labelledby="tab-recommend">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h1 class="card-title">Visualization Discovery &amp; Recommendation Engine</h1>
+            <p class="card-subtitle">Match your variables and analytical question to valid chart families with expandable trade-off notes.</p>
+          </div>
+        </div>
+
+        <div class="bento-3col">
+          <div class="form-group">
+            <label for="rec-objective-select">1. Primary Analytical Question (Part 7.2)</label>
+            <select id="rec-objective-select"></select>
+          </div>
+          <div class="form-group">
+            <label for="rec-audience-select">2. Communication Audience (Part 3)</label>
+            <select id="rec-audience-select">
+              <option value="general">General Public (Plain-language clarity)</option>
+              <option value="student">Student (Conceptual exploration &amp; comparisons)</option>
+              <option value="instructor">Instructor (Classroom demonstration &amp; caveats)</option>
+              <option value="researcher">Researcher / Analyst (Full diagnostics &amp; precision)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <span class="field-label">3. Active Variables Included (<button type="button" class="btn btn-sm" id="btn-rec-select-all" style="padding:1px 6px;">All Non-ID</button>)</span>
+            <div id="rec-variable-checkboxes" style="display:flex; gap:8px; flex-wrap:wrap; padding-top:4px;"></div>
+          </div>
+        </div>
+
+        <div id="rec-signature-banner" class="callout callout-info"></div>
+      </div>
+
+      <!-- Recommendation Filter Tabs -->
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div class="segmented-control" role="group" aria-label="Filter Recommendations by Suitability Tier">
+          <button type="button" class="segmented-btn active" data-rec-tier="all">All Tiers</button>
+          <button type="button" class="segmented-btn" data-rec-tier="Recommended">Recommended</button>
+          <button type="button" class="segmented-btn" data-rec-tier="Appropriate alternative">Appropriate Alternatives</button>
+          <button type="button" class="segmented-btn" data-rec-tier="Conditionally suitable">Conditionally Suitable</button>
+          <button type="button" class="segmented-btn" data-rec-tier="Inappropriate for the selected structure">Inappropriate (Why Rejected)</button>
+        </div>
+      </div>
+
+      <div id="recommendations-grid" class="bento-2col">
+        <!-- Populated by app.js -->
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         DESTINATION 4: CHART STUDIO WORKSPACE (Part 5.4, Part 8, & Part 9)
+         ===================================================================== -->
+    <section id="view-studio" class="view-section" aria-labelledby="tab-studio">
+      <div class="studio-grid">
+
+        <!-- LEFT PANEL: Data & Mappings (Part 9.1) -->
+        <aside class="card" aria-label="Chart Studio Data and Aesthetic Mappings">
+          <div class="card-header">
+            <h2 class="card-title">Data &amp; Mappings</h2>
+            <div style="display:flex; gap:4px;">
+              <button type="button" class="btn btn-sm" id="studio-btn-undo" title="Undo chart edit (Ctrl+Z)">↶</button>
+              <button type="button" class="btn btn-sm" id="studio-btn-redo" title="Redo chart edit (Ctrl+Y)">↷</button>
+              <button type="button" class="btn btn-sm" id="studio-btn-reset" title="Reset chart configuration to preset defaults">Reset</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="studio-chart-type">Chart Family &amp; Type</label>
+            <select id="studio-chart-type"></select>
+          </div>
+
+          <div class="form-group">
+            <label for="studio-map-x">Horizontal Axis / Primary (X)</label>
+            <select id="studio-map-x"></select>
+          </div>
+
+          <div class="form-group" id="studio-group-y">
+            <label for="studio-map-y">Vertical Axis / Response (Y)</label>
+            <select id="studio-map-y"></select>
+          </div>
+
+          <div class="form-group" id="studio-group-color">
+            <label for="studio-map-color">Grouping / Color Encoding</label>
+            <select id="studio-map-color"></select>
+          </div>
+
+          <!-- Secondary Encodings & Aggregation Toggle -->
+          <details class="collapsible-panel" open>
+            <summary>Size, Facets &amp; Aggregation</summary>
+            <div class="collapsible-body" style="display:flex; flex-direction:column; gap:8px;">
+              <div class="form-group" id="studio-group-size">
+                <label for="studio-map-size">Marker Area Size Variable</label>
+                <select id="studio-map-size"></select>
+              </div>
+
+              <div class="form-group" id="studio-group-facet">
+                <label for="studio-map-facet">Facet / Small Multiples By</label>
+                <select id="studio-map-facet"></select>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group" id="studio-group-agg">
+                  <label for="studio-agg-func">Aggregation</label>
+                  <select id="studio-agg-func">
+                    <option value="count">Count (n)</option>
+                    <option value="proportion">Proportion [0,1]</option>
+                    <option value="percentage">Percentage (%)</option>
+                    <option value="sum">Sum (Total)</option>
+                    <option value="mean">Arithmetic Mean</option>
+                    <option value="median">Median (Type 7)</option>
+                  </select>
+                </div>
+                <div class="form-group" id="studio-group-sort">
+                  <label for="studio-sort-order">Category Order</label>
+                  <select id="studio-sort-order">
+                    <option value="default">Natural / Factor</option>
+                    <option value="desc">Descending Value</option>
+                    <option value="asc">Ascending Value</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </details>
+
+          <!-- Context-Aware Statistical Parameters Toggle -->
+          <details class="collapsible-panel" open>
+            <summary>Statistical &amp; Scale Controls</summary>
+            <div class="collapsible-body" style="display:flex; flex-direction:column; gap:8px;">
+              <div class="form-group" id="studio-ctrl-hist-scale">
+                <label for="studio-hist-scale">Histogram Y Scale</label>
+                <select id="studio-hist-scale">
+                  <option value="count">Frequency Count (n_k)</option>
+                  <option value="relative">Relative Frequency (n_k / n)</option>
+                  <option value="density">Probability Density f̂(x) [Area = 1]</option>
+                </select>
+              </div>
+
+              <div class="form-group" id="studio-ctrl-bins">
+                <label for="studio-bin-count">Bins / Grid Cells: <span class="mono" id="studio-bin-count-val">12</span></label>
+                <input type="range" id="studio-bin-count" min="3" max="35" step="1" value="12">
+              </div>
+
+              <div class="form-group" id="studio-ctrl-bw">
+                <label for="studio-bw-mult">KDE Bandwidth Multiplier: <span class="mono" id="studio-bw-mult-val">1.00×</span></label>
+                <input type="range" id="studio-bw-mult" min="0.25" max="2.5" step="0.05" value="1.0">
+              </div>
+
+              <div class="form-group" id="studio-ctrl-uncertainty">
+                <label for="studio-uncertainty-type">Interval Meaning (Part 13.10)</label>
+                <select id="studio-uncertainty-type">
+                  <option value="ci95">95% Confidence Interval for Mean</option>
+                  <option value="pi95">95% Prediction Interval (Individual)</option>
+                  <option value="se">±1 Standard Error of Mean (SE)</option>
+                  <option value="sd">±1 Sample Standard Deviation (SD)</option>
+                </select>
+              </div>
+
+              <div class="form-group" id="studio-ctrl-bubble-enc">
+                <label for="studio-size-encoding">Bubble Magnitude Mapping</label>
+                <select id="studio-size-encoding">
+                  <option value="area">Circle Area (r ∝ √value — Valid)</option>
+                  <option value="radius">Circle Radius (r ∝ value — Distorted)</option>
+                </select>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="studio-y-baseline">Y Baseline</label>
+                  <input type="number" id="studio-y-baseline" value="0" step="10">
+                </div>
+                <div class="form-group">
+                  <label for="studio-palette">Color Palette</label>
+                  <select id="studio-palette">
+                    <option value="datasense">DataSense Archival</option>
+                    <option value="okabe_ito">Okabe-Ito (CVD Safe)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="studio-opacity">Opacity: <span class="mono" id="studio-opacity-val">0.85</span></label>
+                  <input type="range" id="studio-opacity" min="0.15" max="1.0" step="0.05" value="0.85">
+                </div>
+                <div class="form-group">
+                  <label for="studio-point-radius">Marker Size: <span class="mono" id="studio-radius-val">5.4</span></label>
+                  <input type="range" id="studio-point-radius" min="2.5" max="12" step="0.5" value="5.4">
+                </div>
+              </div>
+
+              <div style="display:flex; flex-direction:column; gap:4px; font-size:12px;">
+                <label style="justify-content:flex-start; gap:6px;"><input type="checkbox" id="studio-log-x"> Logarithmic Scale X (log10)</label>
+                <label style="justify-content:flex-start; gap:6px;"><input type="checkbox" id="studio-log-y"> Logarithmic Scale Y (log10)</label>
+                <label style="justify-content:flex-start; gap:6px;"><input type="checkbox" id="studio-show-ols"> Overlay OLS Fit &amp; 95% Mean CI</label>
+                <label style="justify-content:flex-start; gap:6px;"><input type="checkbox" id="studio-show-quad"> Overlay Quadratic Fit (b0+b1x+b2x²)</label>
+                <label style="justify-content:flex-start; gap:6px;"><input type="checkbox" id="studio-show-raw-points"> Overlay Jittered Raw Observations</label>
+              </div>
+            </div>
+          </details>
+
+          <!-- Labels, Reference Line & Annotation Toggle -->
+          <details class="collapsible-panel">
+            <summary>Title, Reference Line &amp; Annotations</summary>
+            <div class="collapsible-body" style="display:flex; flex-direction:column; gap:8px;">
+              <div class="form-group">
+                <label for="studio-title-input">Chart Title</label>
+                <input type="text" id="studio-title-input" placeholder="Auto-generated title...">
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="studio-ref-line">Reference Line</label>
+                  <input type="number" id="studio-ref-line" placeholder="Optional value">
+                </div>
+                <div class="form-group">
+                  <label for="studio-annotation">Annotation</label>
+                  <input type="text" id="studio-annotation" placeholder="Canvas callout...">
+                </div>
+              </div>
+            </div>
+          </details>
+        </aside>
+
+        <!-- CENTRAL WORKSPACE: Main Visualization Canvas, Comparison Mode, & Data Inspection (Part 9.1 & 9.3) -->
+        <div style="display:flex; flex-direction:column; gap:var(--space-md);">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h1 class="card-title" id="studio-canvas-heading">Active Statistical Graphic</h1>
+                <p class="card-subtitle" id="studio-canvas-subheading">Hover or click any mark to inspect/highlight observations.</p>
+              </div>
+              <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+                <label style="font-size:12px; gap:6px; cursor:pointer;">
+                  <input type="checkbox" id="studio-compare-toggle"> Side-by-Side Comparison View
+                </label>
+                <select id="studio-compare-chart-type" style="width:190px; display:none;" aria-label="Comparison Chart Type"></select>
+              </div>
+            </div>
+
+            <div id="studio-canvas-grid" class="bento-equal" style="grid-template-columns: 1fr;">
+              <div class="canvas-container">
+                <canvas id="studio-main-canvas" width="760" height="440" tabindex="0" aria-label="Primary interactive statistical chart canvas"></canvas>
+                <div id="studio-main-tooltip" class="chart-tooltip" style="display:none;"></div>
+              </div>
+              <div class="canvas-container" id="studio-compare-container" style="display:none;">
+                <canvas id="studio-compare-canvas" width="760" height="440" tabindex="0" aria-label="Comparison statistical chart canvas"></canvas>
+                <div id="studio-compare-tooltip" class="chart-tooltip" style="display:none;"></div>
+              </div>
+            </div>
+
+            <!-- Keyboard-Accessible Mark Inspector, Point Selection & Filtering -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; padding-top:4px;">
+              <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+                <div class="badge" id="studio-live-readout" aria-live="polite">Move pointer over chart or click a mark to select →</div>
+                <button type="button" class="btn btn-sm" id="studio-btn-filter-selected" style="display:none;" title="Non-destructively filter out the selected mark/observation">Filter Out Selected</button>
+                <button type="button" class="btn btn-sm" id="studio-btn-clear-selection" style="display:none;">Clear Selection</button>
+              </div>
+              <div style="display:flex; gap:6px; align-items:center;">
+                <label for="studio-keyboard-inspector" class="field-label">Accessible Mark Inspector:</label>
+                <select id="studio-keyboard-inspector" style="width:240px;" aria-label="Inspect chart marks via keyboard"></select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Synchronized Statistical Summary & Accessible Table (Collapsible) -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Statistical Summary &amp; Accessible Data Table</h2>
+              <span class="badge badge-primary" id="studio-effective-n-badge">n = 0</span>
+            </div>
+            <details class="collapsible-panel" open>
+              <summary>Summary Moments, Diagnostics &amp; Accessible Table Equivalent</summary>
+              <div class="collapsible-body">
+                <div id="studio-statistical-summary-box"></div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- RIGHT PANEL: Interpretation, Integrity Engine, & Reproducible Exports (Part 9.1, 9.4, 16, 17) -->
+        <aside class="card studio-right-panel" aria-label="Statistical Interpretation, Integrity Audit, and Exports">
+          <div class="card-header">
+            <h2 class="card-title">Interpretation &amp; Audit</h2>
+            <span class="badge badge-info" id="studio-exp-mode-badge">Mode: Standard</span>
+          </div>
+
+          <!-- 3-Part Interpretation Panel (Part 9.4) -->
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <div class="callout">
+              <strong>What am I looking at?</strong>
+              <span id="interp-looking-at"></span>
+            </div>
+            <div class="callout">
+              <strong>What does this reveal?</strong>
+              <span id="interp-reveals"></span>
+            </div>
+            <details class="collapsible-panel" open>
+              <summary>Caution &amp; Methodological Assumptions</summary>
+              <div class="collapsible-body">
+                <div class="callout callout-warning" style="margin:0;">
+                  <span id="interp-caution"></span>
+                </div>
+              </div>
+            </details>
+          </div>
+
+          <!-- Data Visualization Integrity Checker (Part 16) -->
+          <div class="card-header" style="margin-top:4px;">
+            <h3 class="card-title" style="font-size:17px;">Integrity Audit</h3>
+            <span class="badge" id="integrity-count-badge">0 Warnings</span>
+          </div>
+          <div id="studio-integrity-warnings" style="display:flex; flex-direction:column; gap:8px;">
+            <!-- Populated by app.js -->
+          </div>
+
+          <!-- Exports & Reproducibility (Part 17) -->
+          <div class="card-header" style="margin-top:4px;">
+            <h3 class="card-title" style="font-size:17px;">Export &amp; Reproducibility</h3>
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px;">
+            <button type="button" class="btn btn-primary btn-sm" id="btn-export-svg">↓ SVG Chart</button>
+            <button type="button" class="btn btn-primary btn-sm" id="btn-export-png">↓ PNG Image</button>
+            <button type="button" class="btn btn-sm" id="btn-export-csv">↓ CSV (Sanitized)</button>
+            <button type="button" class="btn btn-sm" id="btn-export-config-json">↓ Config JSON</button>
+            <button type="button" class="btn btn-sm" id="btn-export-datasense-json">↓ DataSense JSON</button>
+            <button type="button" class="btn btn-sm" id="btn-export-r">↓ R (ggplot2)</button>
+            <button type="button" class="btn btn-sm" id="btn-export-python">↓ Python Script</button>
+            <button type="button" class="btn btn-sm" id="btn-export-latex">↓ LaTeX Table</button>
+          </div>
+          <div style="display:flex; gap:6px; margin-top:4px;">
+            <button type="button" class="btn btn-sm" id="btn-copy-share-hash" style="flex:1;">🔗 Copy Shareable State Link</button>
+            <button type="button" class="btn btn-sm" id="btn-import-config-json" style="flex:1;">↑ Reload Config JSON</button>
+          </div>
+          <button type="button" class="btn btn-sm" id="btn-open-worksheet-modal" style="margin-top:4px; width:100%;">
+            🖨 Printable Classroom FRQ Worksheet &amp; Answer Key
+          </button>
+        </aside>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         DESTINATION 5: KNOWN VISUALIZATION UNITY (Part 5.5 & Part 10)
+         ===================================================================== -->
+    <section id="view-unity" class="view-section" aria-labelledby="tab-unity">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h1 class="card-title">Known Visualization Unity — "One Dataset, Many Views"</h1>
+            <p class="card-subtitle">Compare how 4 chart families project the exact same observations under synchronized parameters.</p>
+          </div>
+        </div>
+
+        <div class="bento-3col">
+          <div class="form-group">
+            <label for="unity-group-select">Select Unity Structure Group (All 16 Groups)</label>
+            <select id="unity-group-select"></select>
+          </div>
+          <div class="form-group">
+            <label for="unity-bin-slider">Synchronized Bins / Resolution: <span class="mono" id="unity-bin-val">12</span></label>
+            <input type="range" id="unity-bin-slider" min="4" max="30" step="1" value="12">
+          </div>
+          <div class="form-group">
+            <label for="unity-bw-slider">Synchronized KDE Bandwidth: <span class="mono" id="unity-bw-val">1.00×</span></label>
+            <input type="range" id="unity-bw-slider" min="0.3" max="2.2" step="0.05" value="1.0">
+          </div>
+        </div>
+
+        <div id="unity-invariant-banner" class="callout callout-info"></div>
+      </div>
+
+      <!-- 4 Synchronized Canvases Rendering the Same Observations -->
+      <div class="bento-equal" id="unity-multi-canvas-grid">
+        <div class="card card-compact">
+          <div class="card-header">
+            <h3 id="unity-slot-title-0">View A</h3>
+            <select id="unity-slot-select-0" style="width:180px;" aria-label="Unity View A Chart Type"></select>
+          </div>
+          <div class="canvas-container compact-canvas">
+            <canvas id="unity-canvas-0" width="540" height="250"></canvas>
+            <div id="unity-tooltip-0" class="chart-tooltip" style="display:none;"></div>
+          </div>
+          <div id="unity-slot-meta-0" class="callout" style="font-size:12px;"></div>
+        </div>
+
+        <div class="card card-compact">
+          <div class="card-header">
+            <h3 id="unity-slot-title-1">View B</h3>
+            <select id="unity-slot-select-1" style="width:180px;" aria-label="Unity View B Chart Type"></select>
+          </div>
+          <div class="canvas-container compact-canvas">
+            <canvas id="unity-canvas-1" width="540" height="250"></canvas>
+            <div id="unity-tooltip-1" class="chart-tooltip" style="display:none;"></div>
+          </div>
+          <div id="unity-slot-meta-1" class="callout" style="font-size:12px;"></div>
+        </div>
+
+        <div class="card card-compact">
+          <div class="card-header">
+            <h3 id="unity-slot-title-2">View C</h3>
+            <select id="unity-slot-select-2" style="width:180px;" aria-label="Unity View C Chart Type"></select>
+          </div>
+          <div class="canvas-container compact-canvas">
+            <canvas id="unity-canvas-2" width="540" height="250"></canvas>
+            <div id="unity-tooltip-2" class="chart-tooltip" style="display:none;"></div>
+          </div>
+          <div id="unity-slot-meta-2" class="callout" style="font-size:12px;"></div>
+        </div>
+
+        <div class="card card-compact">
+          <div class="card-header">
+            <h3 id="unity-slot-title-3">View D</h3>
+            <select id="unity-slot-select-3" style="width:180px;" aria-label="Unity View D Chart Type"></select>
+          </div>
+          <div class="canvas-container compact-canvas">
+            <canvas id="unity-canvas-3" width="540" height="250"></canvas>
+            <div id="unity-tooltip-3" class="chart-tooltip" style="display:none;"></div>
+          </div>
+          <div id="unity-slot-meta-3" class="callout" style="font-size:12px;"></div>
+        </div>
+      </div>
+
+      <!-- Special Interactive Deep-Dive: Raw Data vs Bootstrap Sampling Distribution vs CI vs PI (Part 10.7) -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">Uncertainty &amp; Sampling Distribution Unity (Part 10.7)</h2>
+            <p class="card-subtitle">Compare raw observation spread (s) against the bootstrap sampling distribution of the mean (SE = s/√n).</p>
+          </div>
+          <button type="button" class="btn btn-primary btn-sm" id="btn-run-unity-bootstrap">↻ Recompute Deterministic Bootstrap (B = 1,000)</button>
+        </div>
+        <div id="unity-bootstrap-readout" class="metric-grid"></div>
+      </div>
+
+      <!-- Similarity Ontology Matrix (Part 10.8 — Collapsible) -->
+      <div class="card">
+        <details class="collapsible-panel">
+          <summary>Structured Chart Similarity Ontology Matrix (Part 10.8 — Click to Expand)</summary>
+          <div class="collapsible-body">
+            <div class="table-scroll">
+              <table class="data-table" aria-label="Known Visualization Unity Similarity Ontology">
+                <thead>
+                  <tr>
+                    <th>From Chart</th>
+                    <th>To Chart</th>
+                    <th>Relationship</th>
+                    <th>Statistical Target</th>
+                    <th>Transformation &amp; Encoding Shift</th>
+                    <th>Information Preservation &amp; Caution</th>
+                  </tr>
+                </thead>
+                <tbody id="unity-ontology-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         DESTINATION 6: VISUALIZATION ATLAS (Part 5.6 & Part 11)
+         ===================================================================== -->
+    <section id="view-atlas" class="view-section" aria-labelledby="tab-atlas">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h1 class="card-title">Visualization Knowledge Atlas (34 Chart Families)</h1>
+            <p class="card-subtitle">Filter by family, variable structure, objective, and implementation tier.</p>
+          </div>
+        </div>
+
+        <div class="bento-4col">
+          <div class="form-group">
+            <label for="atlas-search-input">Full-Text Search</label>
+            <input type="search" id="atlas-search-input" placeholder="Search chart name, mark, formula...">
+          </div>
+          <div class="form-group">
+            <label for="atlas-category-filter">Major Category</label>
+            <select id="atlas-category-filter">
+              <option value="all">All Categories</option>
+              <option value="Distributions">Distributions</option>
+              <option value="Correlations and Relationships">Correlations &amp; Relationships</option>
+              <option value="Group Comparisons">Group Comparisons</option>
+              <option value="Rankings">Rankings</option>
+              <option value="Composition">Composition</option>
+              <option value="Evolution and Time">Evolution &amp; Time</option>
+              <option value="Uncertainty">Uncertainty</option>
+              <option value="Model Diagnostics">Model Diagnostics</option>
+              <option value="Geography">Geography</option>
+              <option value="Hierarchies">Hierarchies</option>
+              <option value="Networks and Flows">Networks &amp; Flows</option>
+              <option value="Multivariate Displays">Multivariate Displays</option>
+              <option value="Chart Integrity">Chart Integrity / Anti-Patterns</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="atlas-objective-filter">Analytical Objective</label>
+            <select id="atlas-objective-filter">
+              <option value="all">All Objectives</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="atlas-support-filter">Implementation Tier (Part 4)</label>
+            <select id="atlas-support-filter">
+              <option value="all">All Support Tiers</option>
+              <option value="builder">Level A: General Builder Supported</option>
+              <option value="atlas_interactive">Level B: Interactive Atlas Example</option>
+              <option value="reference">Level C: Reference &amp; Anti-Pattern</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="bento-2col">
+        <!-- Left: Filtered Chart Catalog List -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Chart Families (<span id="atlas-count-label">34</span>)</h2>
+          </div>
+          <div id="atlas-catalog-list" style="display:flex; flex-direction:column; gap:8px; max-height:680px; overflow-y:auto;"></div>
+        </div>
+
+        <!-- Right: 20-Point Chart Entry Specification + Live Interactive Demonstration (Part 11.2) -->
+        <div class="card" id="atlas-detail-panel">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title" id="atlas-detail-title">Select a Chart Family</h2>
+              <p class="card-subtitle" id="atlas-detail-alt"></p>
+            </div>
+            <button type="button" class="btn btn-primary btn-sm" id="atlas-btn-open-studio">Launch in Chart Studio →</button>
+          </div>
+
+          <div class="canvas-container compact-canvas">
+            <canvas id="atlas-demo-canvas" width="580" height="250" aria-label="Atlas live interactive example canvas"></canvas>
+            <div id="atlas-demo-tooltip" class="chart-tooltip" style="display:none;"></div>
+          </div>
+
+          <div id="atlas-detail-specs" style="display:flex; flex-direction:column; gap:8px;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         DESTINATION 7: CHART LITERACY LAB (Part 5.7 & Part 12)
+         ===================================================================== -->
+    <section id="view-literacy" class="view-section" aria-labelledby="tab-literacy">
+      <!-- 12.1 5-Step Repeatable Chart Reading Process (Collapsible) -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h1 class="card-title">Chart Literacy Lab — Reading Graphics &amp; Repairing Distortions</h1>
+            <p class="card-subtitle">Compare 15 misleading vs. corrected graphics and test your skills on 7 mathematical challenges.</p>
+          </div>
+          <span class="badge badge-primary" id="literacy-score-badge">Challenges Solved: 0 / 7</span>
+        </div>
+
+        <details class="collapsible-panel">
+          <summary>5-Step Repeatable Chart Reading Protocol (Click to Expand Guide)</summary>
+          <div class="collapsible-body">
+            <div id="literacy-reading-steps" class="bento-3col"></div>
+          </div>
+        </details>
+      </div>
+
+      <!-- 12.2 15 Interactive Misleading Visualization Experiments -->
+      <div class="bento-2col">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">15 Misleading Visualization Repair Experiments</h2>
+              <p class="card-subtitle">Toggle between the Misleading Distortion and the Mathematically Corrected Graphic.</p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="literacy-exp-select">Select Experiment (All 15 Scenarios)</label>
+            <select id="literacy-exp-select"></select>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+            <div class="segmented-control" role="group" aria-label="Toggle Misleading vs Corrected Chart State">
+              <button type="button" class="segmented-btn active" id="btn-lit-state-misleading" data-lit-mode="misleading">⚠ Misleading Distortion</button>
+              <button type="button" class="segmented-btn" id="btn-lit-state-corrected" data-lit-mode="corrected">✓ Corrected Graphic</button>
+            </div>
+            <span class="badge badge-warning" id="literacy-exp-category-badge">Category</span>
+          </div>
+
+          <div class="canvas-container compact-canvas">
+            <canvas id="literacy-exp-canvas" width="580" height="260" aria-label="Misleading vs Corrected Chart Experiment Canvas"></canvas>
+          </div>
+
+          <div id="literacy-exp-explanation" style="display:flex; flex-direction:column; gap:8px;"></div>
+        </div>
+
+        <!-- 12.3 7 Active Chart Literacy Challenges -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">Active Chart Literacy Challenges (7 Practical Problems)</h2>
+              <p class="card-subtitle">Explicit rule-based mathematical feedback.</p>
+            </div>
+            <button type="button" class="btn btn-sm" id="btn-reset-challenges">Reset Progress</button>
+          </div>
+
+          <div class="form-group">
+            <label for="literacy-challenge-select">Select Challenge</label>
+            <select id="literacy-challenge-select"></select>
+          </div>
+
+          <div id="literacy-challenge-card" style="display:flex; flex-direction:column; gap:10px;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         DESTINATION 8: LEARN (26 CONCEPT LIBRARY LESSONS) (Part 5.8, 11.4, 20)
+         ===================================================================== -->
+    <section id="view-learn" class="view-section" aria-labelledby="tab-learn">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h1 class="card-title">Learn — 26 Graphical, Perceptual, &amp; Statistical Concepts</h1>
+            <p class="card-subtitle">Use the top Simple / Standard / Technical toggle to adjust mathematical depth.</p>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <input type="search" id="learn-search-input" placeholder="Search 26 concepts..." style="width:220px;" aria-label="Search Learn Concepts">
+          </div>
+        </div>
+      </div>
+
+      <div class="bento-2col">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Concept Curriculum (26 Topics)</h2>
+          </div>
+          <div id="learn-topic-list" style="display:flex; flex-direction:column; gap:6px; max-height:640px; overflow-y:auto;"></div>
+        </div>
+
+        <div class="card" id="learn-lesson-detail">
+          <!-- Populated dynamically by app.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         DESTINATION 9: ABOUT & METHODS (Part 5.9 & Part 20.4)
+         ===================================================================== -->
+    <section id="view-about" class="view-section" aria-labelledby="tab-about">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h1 class="card-title">About VisualGrammar, Statistical Methods, &amp; Source Authority</h1>
+            <p class="card-subtitle">Software Version 1.0.0 — Canonical DataSense Studio Ecosystem Application</p>
+          </div>
+        </div>
+
+        <div class="bento-2col">
+          <details class="collapsible-panel" open>
+            <summary>1. Mathematical &amp; Statistical Conventions (Float64 Precision)</summary>
+            <div class="collapsible-body">
+              <p style="margin-bottom:6px;">All calculations in <code>js/math-engine.js</code> execute in IEEE 754 64-bit floating-point arithmetic adhering strictly to <code>STATISTICAL_STANDARDS.md</code>:</p>
+              <ul style="padding-left:18px; display:flex; flex-direction:column; gap:4px; font-size:13px;">
+                <li><strong>Two-Pass Centered Moments:</strong> Sample variance s² = (1 / n-1)∑ (x_i - x̄)² uses Bessel’s n-1 correction and two-pass centering.</li>
+                <li><strong>Hyndman–Fan Type 7 Quantiles:</strong> Quartiles (Q_1, Q_2, Q_3) and percentiles use linear interpolation at k = (n-1)q + 1.</li>
+                <li><strong>Histogram Density vs Count:</strong> Probability density scales bin counts as f̂_k = n_k / (n · w_k) so ∑ f̂_k w_k = 1.0.</li>
+                <li><strong>Kernel Density Estimation:</strong> Gaussian and Epanechnikov kernels with Silverman’s bandwidth h = 0.9 min(s, IQR/1.34) n^{-1/5}.</li>
+                <li><strong>OLS &amp; Influence Diagnostics:</strong> Closed-form Gauss-Markov OLS, Student-t p-values via Lentz incomplete beta, Blom Normal Q–Q positions p_i = (i - 0.375)/(n + 0.25), leverage h_i, studentized residuals r_i, and Cook’s distance D_i.</li>
+              </ul>
+            </div>
+          </details>
+
+          <details class="collapsible-panel" open>
+            <summary>2. Local-First Privacy, Security, &amp; Ecosystem Scope</summary>
+            <div class="collapsible-body">
+              <ul style="padding-left:18px; display:flex; flex-direction:column; gap:4px; font-size:13px;">
+                <li><strong>100% Client-Side Processing:</strong> Uploaded CSV, TSV, and JSON datasets never leave your browser. Zero external analytics or third-party CDNs are loaded.</li>
+                <li><strong>CSV Injection Protection:</strong> Exported CSV cells beginning with <code>=</code>, <code>+</code>, <code>-</code>, or <code>@</code> are automatically escaped per <code>DATA_CONVENTIONS.md</code>.</li>
+                <li><strong>Shareable URL Safety:</strong> Shareable URL hashes encode chart configurations and preset IDs without embedding raw personal datasets.</li>
+                <li><strong>Ecosystem Interoperability:</strong> Exchange datasets and outputs with QuartetLab, ResampleLab, and ForecastLab via shared <code>DataSense</code> v1.0.0 JSON schemas.</li>
+              </ul>
+            </div>
+          </details>
+        </div>
+
+        <details class="collapsible-panel">
+          <summary>3. Approved Statistical &amp; Visualization Reference Ecosystem</summary>
+          <div class="collapsible-body">
+            <p style="font-size:13px; margin:0;">
+              Grounded in the canonical DataSense standards library (<code>DESIGN.md</code>, <code>STATISTICAL_STANDARDS.md</code>, <code>VISUALIZATION_STANDARDS.md</code>, <code>DATA_CONVENTIONS.md</code>, <code>APPLICATION_GUIDELINES.md</code>, <code>STATISTICAL_AUDIT.md</code>) and reference literature:
+              Claus O. Wilke (<em>Fundamentals of Data Visualization</em>), Alberto Cairo (<em>How Charts Lie</em>), Lock et al. (<em>Statistics: Unlocking the Power of Data</em>), Cannon et al. (<em>STAT2: Modeling with Regression and ANOVA</em>), Chihara &amp; Hesterberg (<em>Mathematical Statistics with Resampling and R</em>), H. Pishro-Nik (<em>Introduction to Probability, Statistics, and Random Processes</em>), James, Witten, Hastie, &amp; Tibshirani (<em>An Introduction to Statistical Learning</em>), and Hyndman &amp; Athanasopoulos (<em>Forecasting: Principles and Practice</em>).
+            </p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Upload / Manual Data Entry / Config Import Modal -->
+  <div class="modal-backdrop" id="upload-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="upload-modal-title">
+    <div class="modal-dialog">
+      <div class="card-header">
+        <h2 class="card-title" id="upload-modal-title">Import Dataset or Configuration (Local Browser Only)</h2>
+        <button type="button" class="btn btn-sm" id="btn-close-upload-modal" aria-label="Close modal">✕ Close</button>
+      </div>
+
+      <p class="card-subtitle">
+        Upload a local CSV, TSV, or DataSense JSON file (<code>DataSenseDataset</code>, QuartetLab <code>DataSenseModelOutput</code>, ResampleLab <code>DataSenseSimulationResult</code>, or ForecastLab <code>DataSenseForecastResult</code>), or paste delimited text below.
+      </p>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="file-input-upload">Select File (.csv, .tsv, .txt, .json)</label>
+          <input type="file" id="file-input-upload" accept=".csv,.tsv,.txt,.json">
+        </div>
+        <div class="form-group">
+          <label for="paste-dataset-title">Dataset Title</label>
+          <input type="text" id="paste-dataset-title" value="Custom Imported Dataset">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="paste-raw-textarea">Or Paste CSV / TSV / Manual Table / DataSense JSON</label>
+        <textarea id="paste-raw-textarea" rows="8" class="mono" placeholder="category,measurement,group&#10;Control,14.2,Cohort A&#10;Treatment,21.8,Cohort B&#10;Treatment,19.4,Cohort B"></textarea>
+      </div>
+
+      <div id="upload-validation-msg" class="callout" style="display:none;"></div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+          <button type="button" class="btn btn-sm" id="btn-load-sample-paste">Fill Example CSV</button>
+          <button type="button" class="btn btn-sm" id="btn-load-quartetlab-json" title="Load QuartetLab DataSenseModelOutput JSON">QuartetLab JSON</button>
+          <button type="button" class="btn btn-sm" id="btn-load-resamplelab-json" title="Load ResampleLab DataSenseSimulationResult JSON">ResampleLab JSON</button>
+          <button type="button" class="btn btn-sm" id="btn-load-forecastlab-json" title="Load ForecastLab DataSenseForecastResult JSON">ForecastLab JSON</button>
+        </div>
+        <button type="button" class="btn btn-primary btn-sm" id="btn-confirm-import">Parse &amp; Load Dataset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Printable Classroom FRQ Worksheet & Instructor Answer Key Modal (APPLICATION_GUIDELINES.md Section H.2) -->
+  <div class="modal-backdrop" id="worksheet-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="worksheet-modal-title">
+    <div class="modal-dialog" style="width:min(820px, 95vw);">
+      <div class="card-header">
+        <div>
+          <h2 class="card-title" id="worksheet-modal-title">Classroom Free-Response (FRQ) Worksheet &amp; Answer Key</h2>
+          <p class="card-subtitle">Dynamically generated from the active dataset, chart configuration, and statistical diagnostics.</p>
+        </div>
+        <div style="display:flex; gap:6px;">
+          <button type="button" class="btn btn-sm" id="btn-toggle-worksheet-answers">Show Instructor Answer Key</button>
+          <button type="button" class="btn btn-primary btn-sm" id="btn-print-worksheet">🖨 Print / Save PDF</button>
+          <button type="button" class="btn btn-sm" id="btn-close-worksheet-modal">✕ Close</button>
+        </div>
+      </div>
+      <div id="worksheet-modal-body" style="display:flex; flex-direction:column; gap:12px;"></div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+  <!-- Application Footer -->
+  <footer class="app-footer" role="contentinfo">
+    <div class="footer-inner">
+      <div>
+        <strong>VisualGrammar v1.0.0</strong> — DataSense Studio Ecosystem | Zero-Backend Static Architecture | WCAG 2.2 AA &amp; RFC 4180 Compliant
+      </div>
+      <div>
+        <span>17 Built-in Datasets • 34 Chart Families • 16 Unity Groups • 15 Repair Experiments • 26 Concept Articles</span>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>

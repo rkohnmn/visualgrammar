@@ -1,0 +1,25 @@
+sensor_id,zip_code,department,priority_tier,alarm_triggered,pressure_kpa,temp_c
+1001,18101,Water Works,Tier 1,0,214.5,14.2
+1002,18101,Water Works,Tier 2,0,221,15.1
+1003,18102,Water Works,Tier 1,1,268.4,19.8
+1004,18102,Water Works,Tier 3,0,198.2,12.6
+1005,18103,Water Works,Tier 2,0,209.7,14
+1006,18104,Water Works,Tier 1,1,274.1,21
+1007,18101,District Steam,Tier 1,1,312.8,38.4
+1008,18101,District Steam,Tier 1,1,325,41.2
+1009,18102,District Steam,Tier 2,0,284.5,33
+1010,18103,District Steam,Tier 2,0,279.1,31.8
+1011,18103,District Steam,Tier 3,0,266.3,29.5
+1012,18104,District Steam,Tier 1,1,339.2,44
+1013,18101,Gas Distribution,Tier 2,0,154,11.4
+1014,18102,Gas Distribution,Tier 3,0,148.6,10.9
+1015,18102,Gas Distribution,Tier 2,0,162.3,12.2
+1016,18103,Gas Distribution,Tier 1,1,194.8,16.5
+1017,18104,Gas Distribution,Tier 3,0,142.1,9.8
+1018,18104,Gas Distribution,Tier 2,0,158.9,11.7
+1019,18101,Storm Telemetry,Tier 3,0,118.4,8.5
+1020,18102,Storm Telemetry,Tier 3,0,124.2,9.1
+1021,18103,Storm Telemetry,Tier 2,0,131.7,10.3
+1022,18103,Storm Telemetry,Tier 1,1,176.5,15
+1023,18104,Storm Telemetry,Tier 3,0,115,8
+1024,18104,Storm Telemetry,Tier 2,0,129.8,9.6

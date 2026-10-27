@@ -1,0 +1,133 @@
+/* ==========================================================================
+   DataSense Design System Tokens — VisualGrammar
+   Conforms to DESIGN.md v1.0.0 (Bell Labs Monograph + HP Oscilloscope Aesthetic)
+   ========================================================================== */
+
+:root {
+  /* Color Roles — Light Mode (Warm Archival Grid Paper) */
+  --color-primary: #0F6E56;
+  --color-primary-hover: #0B5542;
+  --color-primary-soft: rgba(15, 110, 86, 0.12);
+  --color-secondary: #D9381E;
+  --color-secondary-soft: rgba(217, 56, 30, 0.12);
+  --color-surface: #FFFFFF;
+  --color-surface-elevated: #FAF9F5;
+  --color-background: #F6F4EE;
+  --color-text: #141619;
+  --color-text-muted: #525866;
+  --color-border: #D8D4C8;
+  --color-border-strong: #B8B2A2;
+  --color-error: #C92A2A;
+  --color-error-bg: rgba(201, 42, 42, 0.09);
+  --color-warning: #B45309;
+  --color-warning-bg: rgba(180, 83, 9, 0.10);
+  --color-success: #0F6E56;
+  --color-success-bg: rgba(15, 110, 86, 0.10);
+  --color-accent-highlight: #1D4ED8;
+  --color-accent-soft: rgba(29, 78, 216, 0.10);
+  --color-alt-model: #7C3AED;
+  --color-grid-major: #E5E1D6;
+  --color-grid-minor: #F0EDE4;
+
+  /* Colorblind-Safe Categorical Palette (Okabe-Ito / DataSense Harmonized) */
+  --palette-cat-1: #0F6E56;
+  --palette-cat-2: #D9381E;
+  --palette-cat-3: #1D4ED8;
+  --palette-cat-4: #B45309;
+  --palette-cat-5: #7C3AED;
+  --palette-cat-6: #0891B2;
+  --palette-cat-7: #BE185D;
+  --palette-cat-8: #4D7C0F;
+
+  /* Typography */
+  --font-headline: 'Instrument Serif', 'Georgia', 'Times New Roman', serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'SFMono-Regular', Consolas, monospace;
+
+  --text-headline-size: 28px;
+  --text-headline-weight: 600;
+  --text-headline-lh: 1.2;
+  --text-headline-ls: -0.02em;
+
+  --text-body-size: 15px;
+  --text-body-weight: 400;
+  --text-body-lh: 1.55;
+
+  --text-mono-size: 13px;
+  --text-mono-weight: 500;
+  --text-mono-lh: 1.45;
+
+  /* Spacing Scale (8px Base Unit) */
+  --space-unit: 8px;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+
+  /* Radii */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-pill: 9999px;
+
+  /* Elevation & Shadows */
+  --shadow-sm: 0 1px 2px rgba(20, 22, 25, 0.06);
+  --shadow-md: 0 4px 12px rgba(20, 22, 25, 0.08);
+  --shadow-lg: 0 10px 25px rgba(20, 22, 25, 0.14);
+
+  /* Transitions */
+  --transition-fast: 160ms ease-out;
+}
+
+[data-theme="dark"] {
+  --color-primary: #34D399;
+  --color-primary-hover: #10B981;
+  --color-primary-soft: rgba(52, 211, 153, 0.14);
+  --color-secondary: #F87171;
+  --color-secondary-soft: rgba(248, 113, 113, 0.14);
+  --color-surface: #151921;
+  --color-surface-elevated: #1C222D;
+  --color-background: #0D1014;
+  --color-text: #F1F5F9;
+  --color-text-muted: #94A3B8;
+  --color-border: #262D3B;
+  --color-border-strong: #3B4459;
+  --color-error: #F87171;
+  --color-error-bg: rgba(248, 113, 113, 0.14);
+  --color-warning: #F59E0B;
+  --color-warning-bg: rgba(245, 158, 11, 0.14);
+  --color-success: #34D399;
+  --color-success-bg: rgba(52, 211, 153, 0.14);
+  --color-accent-highlight: #60A5FA;
+  --color-accent-soft: rgba(96, 165, 250, 0.15);
+  --color-alt-model: #A78BFA;
+  --color-grid-major: #1E2532;
+  --color-grid-minor: #181D27;
+
+  --palette-cat-1: #34D399;
+  --palette-cat-2: #F87171;
+  --palette-cat-3: #60A5FA;
+  --palette-cat-4: #FBBF24;
+  --palette-cat-5: #A78BFA;
+  --palette-cat-6: #22D3EE;
+  --palette-cat-7: #F472B6;
+  --palette-cat-8: #A3E635;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.65);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transition-fast: 0ms;
+  }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

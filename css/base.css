@@ -1,0 +1,192 @@
+/* ==========================================================================
+   Base Reset, Typography, and Responsive Grid Layout — VisualGrammar
+   ========================================================================== */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-body);
+}
+
+body {
+  min-height: 100vh;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: var(--text-body-size);
+  font-weight: var(--text-body-weight);
+  line-height: var(--text-body-lh);
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  background-image:
+    linear-gradient(to right, var(--color-grid-minor) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-grid-minor) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+h1, h2, h3, .serif-heading {
+  font-family: var(--font-headline);
+  font-weight: var(--text-headline-weight);
+  line-height: var(--text-headline-lh);
+  letter-spacing: var(--text-headline-ls);
+  color: var(--color-text);
+}
+
+h1 {
+  font-size: var(--text-headline-size);
+}
+
+h2 {
+  font-size: 22px;
+}
+
+h3 {
+  font-size: 18px;
+}
+
+h4 {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+}
+
+p {
+  margin-bottom: var(--space-sm);
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+a:hover {
+  color: var(--color-primary-hover);
+}
+
+code, pre, .mono, .stat-value, td.numeric, th.numeric, input[type="number"] {
+  font-family: var(--font-mono);
+  font-size: var(--text-mono-size);
+  font-weight: var(--text-mono-weight);
+  line-height: var(--text-mono-lh);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Accessible Focus States */
+:focus-visible {
+  outline: 2px solid var(--color-accent-highlight);
+  outline-offset: 2px;
+}
+
+.skip-link {
+  position: absolute;
+  top: -60px;
+  left: var(--space-md);
+  background: var(--color-primary);
+  color: #FFFFFF;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  z-index: 1000;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  top: var(--space-sm);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Main Application Container */
+.app-container {
+  max-width: 1600px;
+  width: 100%;
+  margin: 0 auto;
+  padding: var(--space-md);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* Asymmetric Bento Grid Systems */
+.studio-grid {
+  display: grid;
+  grid-template-columns: 310px minmax(0, 1fr) 360px;
+  gap: var(--space-md);
+  align-items: start;
+}
+
+.bento-2col {
+  display: grid;
+  grid-template-columns: 7fr 5fr;
+  gap: var(--space-md);
+  align-items: start;
+}
+
+.bento-equal {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-md);
+}
+
+.bento-3col {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-md);
+}
+
+.bento-4col {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-md);
+}
+
+@media (max-width: 1280px) {
+  .studio-grid {
+    grid-template-columns: 280px minmax(0, 1fr);
+  }
+  .studio-grid > .studio-right-panel {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 1024px) {
+  .studio-grid,
+  .bento-2col,
+  .bento-3col,
+  .bento-4col {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .app-container {
+    padding: var(--space-sm);
+  }
+  .bento-equal {
+    grid-template-columns: 1fr;
+  }
+}

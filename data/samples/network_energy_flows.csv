@@ -1,0 +1,13 @@
+source_node,target_node,flow_twh,transmission_loss_pct
+Solar PV,Residential,42,3.1
+Solar PV,Grid Storage,28.5,4.5
+Solar PV,Industrial,19,2.8
+Wind Turbines,Industrial,54,4.2
+Wind Turbines,Residential,36.5,3.9
+Wind Turbines,Electric Transit,24,3.5
+Hydroelectric,Industrial,38,2.4
+Hydroelectric,Residential,31,2.6
+Natural Gas,Industrial,62,2.1
+Natural Gas,Residential,44,2.3
+Natural Gas,Electric Transit,18.5,2.2
+Grid Storage,Electric Transit,22,1.8

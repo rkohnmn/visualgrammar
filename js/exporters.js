@@ -1,0 +1,245 @@
+/**
+ * VisualGrammar — Multi-Format Exporters, Reproducibility, & Security Sanitization (exporters.js)
+ * Conforms strictly to DATA_CONVENTIONS.md Section D & E and Part 17 of the VisualGrammar specification.
+ */
+
+import { computeDatasetDiagnostics } from './math-engine.js';
+
+/**
+ * Sanitize and escape a cell for RFC 4180 CSV export, preventing Spreadsheet Formula Injection
+ * Conforms strictly to DATA_CONVENTIONS.md Section D.2 and Part 17.4
+ */
+export function escapeCsvCell(value) {
+  if (value === null || value === undefined) return '';
+  let str = String(value);
+
+  // Prevent CSV Formula Injection (=, +, -, @, \t, \r) on non-numeric string tokens
+  const isFiniteNum = typeof value === 'number' && Number.isFinite(value);
+  if (!isFiniteNum && /^[=+\-@\t\r]/.test(str)) {
+    str = `'${str}`;
+  }
+
+  if (/[",\r\n]/.test(str)) {
+    return `"${str.replace(/"/g, '""')}"`;
+  }
+  return str;
+}
+
+/**
+ * Export Active Dataset to RFC 4180 Compliant CSV
+ */
+export function exportToCSV(rows, headers, provenanceSteps = []) {
+  const cols = Array.isArray(headers) && headers.length > 0
+    ? headers
+    : (rows.length > 0 ? Object.keys(rows[0]) : []);
+
+  const headerLine = cols.map(escapeCsvCell).join(',');
+  const dataLines = rows.map(r => cols.map(c => escapeCsvCell(r[c])).join(','));
+  return [headerLine, ...dataLines].join('\r\n');
+}
+
+/**
+ * Export Reproducible Visualization Configuration JSON (Part 17.2)
+ */
+export function exportConfigurationJSON(appState) {
+  const payload = {
+    $schema: 'https://datasense-studio.github.io/schemas/v1/visualgrammar-config.json',
+    application: 'VisualGrammar',
+    version: '1.0.0',
+    exportedAt: new Date().toISOString(),
+    explanationLevel: appState.explanationLevel || 'standard',
+    dataset: exportDataSenseDatasetJSON(appState, true),
+    transformationPipeline: appState.transformations || [],
+    chartConfig: {
+      chartType: appState.chartConfig?.chartType || 'bar_vertical',
+      x: appState.chartConfig?.x || '',
+      y: appState.chartConfig?.y || '',
+      color: appState.chartConfig?.color || '',
+      size: appState.chartConfig?.size || '',
+      facet: appState.chartConfig?.facet || '',
+      aggFunc: appState.chartConfig?.aggFunc || 'count',
+      sortOrder: appState.chartConfig?.sortOrder || 'default',
+      histScale: appState.chartConfig?.histScale || 'count',
+      binCount: appState.chartConfig?.binCount || 12,
+      bandwidthMultiplier: appState.chartConfig?.bandwidthMultiplier || 1.0,
+      uncertaintyType: appState.chartConfig?.uncertaintyType || 'ci95',
+      sizeEncoding: appState.chartConfig?.sizeEncoding || 'area',
+      yBaseline: appState.chartConfig?.yBaseline || 0,
+      logScaleX: Boolean(appState.chartConfig?.logScaleX),
+      logScaleY: Boolean(appState.chartConfig?.logScaleY),
+      opacity: appState.chartConfig?.opacity ?? 0.85,
+      pointRadius: appState.chartConfig?.pointRadius ?? 5.4,
+      palette: appState.chartConfig?.palette || 'datasense',
+      showOLS: Boolean(appState.chartConfig?.showOLS),
+      showQuadratic: Boolean(appState.chartConfig?.showQuadratic),
+      showRawPoints: Boolean(appState.chartConfig?.showRawPoints),
+      title: appState.chartConfig?.title || '',
+      subtitle: appState.chartConfig?.subtitle || '',
+      annotationText: appState.chartConfig?.annotationText || '',
+      referenceLineValue: appState.chartConfig?.referenceLineValue ?? ''
+    }
+  };
+  return JSON.stringify(payload, null, 2);
+}
+
+/**
+ * Export DataSenseDataset v1.0.0 Interchange JSON (DATA_CONVENTIONS.md Section E.1)
+ */
+export function exportDataSenseDatasetJSON(appState, returnObject = false) {
+  const profile = appState.profile;
+  const rows = appState.activeRows || [];
+  const obj = {
+    $schema: 'https://datasense-studio.github.io/schemas/v1/dataset.json',
+    version: '1.0.0',
+    metadata: {
+      id: appState.datasetId || 'custom_dataset',
+      title: appState.datasetTitle || 'VisualGrammar Dataset',
+      description: appState.datasetDescription || 'Exported from VisualGrammar',
+      createdAt: new Date().toISOString(),
+      sourceApplication: 'VisualGrammar',
+      applicationVersion: '1.0.0',
+      provenanceSteps: appState.provenanceLog || []
+    },
+    variables: (profile?.variables || []).map(v => ({
+      name: v.name,
+      label: v.label || v.name,
+      unit: v.unit || '',
+      dataType: v.physicalType || 'string',
+      semanticType: v.inferredType,
+      role: v.role || 'attribute'
+    })),
+    observations: rows.map((r, i) => ({
+      obs_id: r.obs_id || `obs_${i + 1}`,
+      ...r
+    }))
+  };
+  return returnObject ? obj : JSON.stringify(obj, null, 2);
+}
+
+/**
+ * Export Reproducible R (ggplot2 + base stats) Script
+ */
+export function exportToRScript(rows, config, datasetTitle = 'VisualGrammar Dataset') {
+  const xCol = config.x || 'x';
+  const yCol = config.y || 'y';
+  return `# Reproducible R / ggplot2 Script — Generated by VisualGrammar v1.0.0
+# Dataset: ${datasetTitle}
+# Chart Type: ${config.chartType}
+
+library(ggplot2)
+
+# Load exported CSV data
+df <- read.csv("visualgrammar_export.csv", stringsAsFactors = FALSE)
+summary(df)
+
+# Construct visualization (${config.chartType})
+p <- ggplot(df, aes(x = .data[["${xCol}"]]${yCol ? `, y = .data[["${yCol}"]]` : ''})) +
+  theme_minimal(base_family = "sans") +
+  labs(
+    title = "${(config.title || datasetTitle).replace(/"/g, '\\"')}",
+    x = "${xCol}",
+    y = "${yCol || 'Count'}"
+  )
+print(p)
+`;
+}
+
+/**
+ * Export Reproducible Python (pandas + seaborn/statsmodels) Script
+ */
+export function exportToPythonScript(rows, config, datasetTitle = 'VisualGrammar Dataset') {
+  const xCol = config.x || 'x';
+  const yCol = config.y || 'y';
+  return `# Reproducible Python Script — Generated by VisualGrammar v1.0.0
+# Dataset: ${datasetTitle}
+# Chart Type: ${config.chartType}
+
+import pandas as pd
+import scipy.stats as stats
+
+df = pd.read_csv("visualgrammar_export.csv")
+print(df.describe(include="all"))
+`;
+}
+
+/**
+ * Export Publication-Quality LaTeX booktabs Summary Table
+ */
+export function exportToLatexTable(profile, datasetTitle = 'Dataset Summary') {
+  if (!profile || !Array.isArray(profile.variables)) return '';
+  const lines = [
+    '% Publication-ready LaTeX table generated by VisualGrammar v1.0.0',
+    '\\begin{table}[htbp]',
+    '\\centering',
+    `\\caption{Variable Taxonomy and Summary Profile: ${datasetTitle.replace(/[_&%$#]/g, '\\$&')}}`,
+    '\\begin{tabular}{llrrr}',
+    '\\toprule',
+    'Variable & Semantic Type & Valid $n$ & Mean / Mode & SD / Unique \\\\',
+    '\\midrule'
+  ];
+
+  for (const v of profile.variables) {
+    const nameEsc = v.name.replace(/_/g, '\\_');
+    const typeEsc = v.taxonomy.shortLabel.replace(/_/g, '\\_');
+    if (v.numericStats) {
+      lines.push(`${nameEsc} & ${typeEsc} & ${v.nValid} & ${v.numericStats.mean.toFixed(2)} & ${v.numericStats.sd.toFixed(2)} \\\\`);
+    } else {
+      const topMode = v.frequencies[0] ? String(v.frequencies[0].value).replace(/_/g, '\\_') : '-';
+      lines.push(`${nameEsc} & ${typeEsc} & ${v.nValid} & ${topMode} & ${v.uniqueCount} classes \\\\`);
+    }
+  }
+
+  lines.push('\\bottomrule', '\\end{tabular}', '\\end{table}');
+  return lines.join('\n');
+}
+
+/**
+ * URL Hash State Serializer (Configuration & Preset Reference Only — Never Leaks Raw Personal Datasets)
+ * Conforms strictly to Part 17.3 and Part 18.3
+ */
+export function encodeShareableHash(appState) {
+  try {
+    const compact = {
+      v: '1.0.0',
+      p: appState.isPreset ? appState.datasetId : null,
+      lvl: appState.explanationLevel || 'standard',
+      cfg: {
+        chartType: appState.chartConfig?.chartType,
+        x: appState.chartConfig?.x,
+        y: appState.chartConfig?.y,
+        color: appState.chartConfig?.color,
+        size: appState.chartConfig?.size,
+        facet: appState.chartConfig?.facet,
+        aggFunc: appState.chartConfig?.aggFunc,
+        histScale: appState.chartConfig?.histScale,
+        binCount: appState.chartConfig?.binCount,
+        uncertaintyType: appState.chartConfig?.uncertaintyType,
+        sizeEncoding: appState.chartConfig?.sizeEncoding,
+        yBaseline: appState.chartConfig?.yBaseline
+      }
+    };
+    const json = JSON.stringify(compact);
+    const b64 = typeof btoa === 'function'
+      ? btoa(unescape(encodeURIComponent(json)))
+      : Buffer.from(json, 'utf8').toString('base64');
+    return `#state=${b64}`;
+  } catch {
+    return '';
+  }
+}
+
+export function decodeShareableHash(hashStr) {
+  try {
+    const cleaned = String(hashStr || '').replace(/^#/, '');
+    if (!cleaned.startsWith('state=')) return null;
+    const b64 = cleaned.slice(6);
+    const json = typeof atob === 'function'
+      ? decodeURIComponent(escape(atob(b64)))
+      : Buffer.from(b64, 'base64').toString('utf8');
+    const parsed = JSON.parse(json);
+    if (!parsed || typeof parsed !== 'object') return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}

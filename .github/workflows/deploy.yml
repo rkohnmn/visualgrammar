@@ -1,0 +1,60 @@
+name: Deploy VisualGrammar to GitHub Pages
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  verify-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run Mathematical & Engine Unit Tests
+        run: node --test tests/*.test.js
+
+      - name: Run Subpath & Static Build Verifier
+        run: python3 tests/verify-build.py
+
+      - name: Run Prose Quality Auditor
+        run: python3 scripts/prose_linter.py README.md ARCHITECTURE.md METHODS.md DATA_FORMATS.md TESTING.md COVERAGE_MATRIX.md DEVELOPMENT.md docs/ARCHITECTURE.md docs/RESEARCH.md docs/PRIVACY.md docs/LAUNCH_PLAN.md
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Static Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "."
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: verify-and-test
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
