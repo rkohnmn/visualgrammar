@@ -1,5 +1,8 @@
 # VisualGrammar
 
+[![Ecosystem Hub: DataSense Studio](https://img.shields.io/badge/Ecosystem%20Hub-DataSense%20Studio-0D1014?style=flat-square)](https://rkohnmn.github.io/datasense-studio/)
+[![DataSense Compass](https://img.shields.io/badge/DataSense-Compass%20Engine-D9381E?style=flat-square)](https://rkohnmn.github.io/datasense-studio/compass/)
+
 **Understand the data. Choose the view. Reveal the story.**
 
 [![Deploy VisualGrammar to GitHub Pages](https://github.com/rkohnmn/visualgrammar/actions/workflows/deploy.yml/badge.svg)](https://github.com/rkohnmn/visualgrammar/actions/workflows/deploy.yml)

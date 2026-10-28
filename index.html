@@ -3,14 +3,52 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VisualGrammar — Understand the Data. Choose the View. Reveal the Story. | DataSense Studio</title>
   <meta name="description" content="VisualGrammar — An interactive statistical laboratory for understanding data types, discovering visualizations, building accurate charts, and learning how graphical representations communicate information.">
-  <title>VisualGrammar — Understand the Data. Choose the View. Reveal the Story.</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%230f766e'/><path d='M7 23 L13 14 L18 19 L25 9' stroke='white' stroke-width='2.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/><circle cx='25' cy='9' r='2' fill='%2338bdf8'/></svg>">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta name="googlebot" content="index, follow">
+  <meta name="author" content="rkohnmn — DataSense Studio">
+  <meta name="keywords" content="VisualGrammar, DataSense Studio, DataSense Compass, grammar of graphics, data visualization, exploratory data analysis, chart discovery">
+  <link rel="canonical" href="https://rkohnmn.github.io/visualgrammar/">
+
+  <!-- Open Graph / Social Discovery -->
+  <meta property="og:site_name" content="DataSense Studio">
+  <meta property="og:title" content="VisualGrammar — Understand the Data. Choose the View. Reveal the Story.">
+  <meta property="og:description" content="An interactive statistical laboratory for understanding data types, discovering visualizations, building accurate charts, and learning graphical communication.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://rkohnmn.github.io/visualgrammar/">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:image" content="https://rkohnmn.github.io/datasense-studio/assets/screenshots/visualgrammar.png">
+
+  <!-- Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="VisualGrammar — Grammar of Graphics Laboratory">
+  <meta name="twitter:description" content="An interactive statistical laboratory for understanding data types, discovering visualizations, building accurate charts, and learning graphical communication.">
+  <meta name="twitter:image" content="https://rkohnmn.github.io/datasense-studio/assets/screenshots/visualgrammar.png">
+
+  <!-- Shared DataSense SVG Favicon -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230D1014'/%3E%3Cpath d='M7 22 L13 14 L18 18 L25 9' stroke='%2310B981' stroke-width='2.5' fill='none' stroke-linecap='round'/%3E%3Ccircle cx='25' cy='9' r='2.5' fill='%23D9381E'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="./css/tokens.css">
   <link rel="stylesheet" href="./css/base.css">
   <link rel="stylesheet" href="./css/components.css">
   <link rel="stylesheet" href="./css/print.css">
-</head>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "VisualGrammar",
+    "applicationCategory": "ScientificApplication",
+    "operatingSystem": "Web Browser",
+    "url": "https://rkohnmn.github.io/visualgrammar/",
+    "description": "Interactive statistical laboratory for data visualization, variable taxonomy, chart discovery, and graphical literacy.",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "DataSense Studio",
+      "url": "https://rkohnmn.github.io/datasense-studio/"
+    }
+  }
+  </script></head>
 <body>
   <a href="#main-workspace" class="skip-link">Skip to main workspace</a>
 
@@ -18,11 +56,13 @@
   <div class="ecosystem-bar no-print" role="navigation" aria-label="DataSense Studio Ecosystem Navigation">
     <div class="ecosystem-links">
       <span class="eco-item"><strong>DataSense Studio Ecosystem:</strong></span>
-      <a href="#view-home" data-eco-link="studio" title="DataSense Studio Hub">DataSense Studio</a>
-      <a href="https://rkohnmn.github.io/quartetlab/" target="_blank" rel="noopener noreferrer" title="QuartetLab — Bivariate OLS, Diagnostics &amp; Exact-Moment Solver">QuartetLab ↗</a>
-      <span class="eco-item eco-active" aria-current="page">● VisualGrammar (v1.0.0)</span>
-      <span class="eco-item" title="ResampleLab — Compatible via DataSenseSimulationResult JSON">ResampleLab (Interoperable)</span>
-      <span class="eco-item" title="ForecastLab — Compatible via DataSenseForecastResult JSON">ForecastLab (Interoperable)</span>
+      <a href="https://rkohnmn.github.io/datasense-studio/" target="_blank" rel="noopener" title="DataSense Studio Hub">DataSense Hub ↗</a>
+      <a href="https://rkohnmn.github.io/datasense-studio/compass/" target="_blank" rel="noopener" title="DataSense Compass Discovery Engine">DataSense Compass ↗</a>
+      <a href="https://rkohnmn.github.io/datamend-lab/" target="_blank" rel="noopener" title="01 · DataMend Lab">01 · Prepare ↗</a>
+      <span class="eco-item eco-active" aria-current="page">● 02 · VisualGrammar (v1.0.0)</span>
+      <a href="https://rkohnmn.github.io/quartetlab/" target="_blank" rel="noopener" title="03 · QuartetLab — Bivariate Diagnostics">03 · Investigate ↗</a>
+      <a href="https://rkohnmn.github.io/resamplelab/" target="_blank" rel="noopener" title="04 · ResampleLab — Bootstrap & Permutation">04 · Infer ↗</a>
+      <a href="https://rkohnmn.github.io/forecastlab/" target="_blank" rel="noopener" title="05 · ForecastLab — Time-Series & Forecasting">05 · Forecast ↗</a>
     </div>
     <div class="ecosystem-links">
       <span class="badge badge-primary" id="privacy-status-badge" title="100% Client-Side Processing — Zero External Telemetry">Local-First Privacy: Active</span>
