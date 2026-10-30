@@ -141,7 +141,7 @@ code, pre, .mono, .stat-value, td.numeric, th.numeric, input[type="number"] {
 
 .bento-2col {
   display: grid;
-  grid-template-columns: 7fr 5fr;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
   gap: var(--space-md);
   align-items: start;
 }
@@ -178,7 +178,7 @@ code, pre, .mono, .stat-value, td.numeric, th.numeric, input[type="number"] {
   .bento-2col,
   .bento-3col,
   .bento-4col {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -187,6 +187,6 @@ code, pre, .mono, .stat-value, td.numeric, th.numeric, input[type="number"] {
     padding: var(--space-sm);
   }
   .bento-equal {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }

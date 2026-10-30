@@ -4,9 +4,10 @@
   "description": "VisualGrammar — Interactive Laboratory for Statistical Data Visualization, Variable Taxonomy, Chart Discovery, and Graphical Literacy",
   "type": "module",
   "scripts": {
-    "test": "node --test tests/math-engine.test.js tests/data-engine.test.js tests/recommendation-integrity.test.js tests/exporters-storage.test.js tests/acceptance-scenarios.test.js",
+    "test": "node --test tests/*.test.js",
     "verify": "node scripts/run-verify.js",
-    "check": "npm run test && npm run verify"
+    "check": "npm run test && npm run verify",
+    "test:browser": "python tests/browser/test_product.py"
   },
   "keywords": [
     "statistics",

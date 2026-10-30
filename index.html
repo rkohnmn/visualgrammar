@@ -31,6 +31,7 @@
   <link rel="stylesheet" href="./css/tokens.css">
   <link rel="stylesheet" href="./css/base.css">
   <link rel="stylesheet" href="./css/components.css">
+  <link rel="stylesheet" href="./css/product.css" media="screen">
   <link rel="stylesheet" href="./css/print.css">
 
   <script type="application/ld+json">
@@ -609,7 +610,7 @@
                 <button type="button" class="btn btn-sm" id="studio-btn-filter-selected" style="display:none;" title="Non-destructively filter out the selected mark/observation">Filter Out Selected</button>
                 <button type="button" class="btn btn-sm" id="studio-btn-clear-selection" style="display:none;">Clear Selection</button>
               </div>
-              <div style="display:flex; gap:6px; align-items:center;">
+              <div style="display:flex; flex-wrap:wrap; gap:6px; align-items:center; min-width:0;">
                 <label for="studio-keyboard-inspector" class="field-label">Accessible Mark Inspector:</label>
                 <select id="studio-keyboard-inspector" style="width:240px;" aria-label="Inspect chart marks via keyboard"></select>
               </div>
@@ -1077,7 +1078,8 @@
         <textarea id="paste-raw-textarea" rows="8" class="mono" placeholder="category,measurement,group&#10;Control,14.2,Cohort A&#10;Treatment,21.8,Cohort B&#10;Treatment,19.4,Cohort B"></textarea>
       </div>
 
-      <div id="upload-validation-msg" class="callout" style="display:none;"></div>
+      <p class="import-guidance">Local import · Up to 2 MB, 5,000 rows, 40 columns, and 100,000 cells. For larger datasets, choose a subset.</p>
+        <div id="upload-validation-msg" role="alert" class="callout" style="display:none;"></div>
 
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
         <div style="display:flex; gap:6px; flex-wrap:wrap;">

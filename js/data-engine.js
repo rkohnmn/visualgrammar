@@ -1,3 +1,4 @@
+import { assertInputSize, assertTableSize, assertHeaders, missingNumber, readDelimitedRecords } from './import-safety.js';
 /**
  * VisualGrammar — Data Understanding, Type Inference, & Transformation Engine (data-engine.js)
  * Conforms to DATA_CONVENTIONS.md v1.0.0 and Part 6 of the VisualGrammar specification.
@@ -222,6 +223,14 @@ const ORDINAL_LEXICONS = [
  * Conforms strictly to DATA_CONVENTIONS.md Section D.1
  */
 export function parseDelimitedText(rawText, options = {}) {
+  try {
+    assertInputSize(rawText);
+    const result = parseDelimitedTextUnchecked(rawText, options);
+    if (result.valid) { assertHeaders(result.headers); assertTableSize(result.rows.length, result.headers.length); }
+    return result;
+  } catch (error) { return {valid:false, headers:[], rows:[], errors:[error.message]}; }
+}
+function parseDelimitedTextUnchecked(rawText, options = {}) {
   if (typeof rawText !== 'string' || !rawText.trim()) {
     return {
       valid: false,
@@ -299,6 +308,7 @@ export function parseDelimitedText(rawText, options = {}) {
       i++;
     }
   }
+  if (inQuotes) throw new Error('Unclosed quotation mark. Close the quoted field before importing.');
   currentRecord.push(currentField.trim());
   if (currentRecord.some(cell => cell !== '')) {
     records.push(currentRecord);
@@ -327,7 +337,7 @@ export function parseDelimitedText(rawText, options = {}) {
     if (rawRow.length !== headers.length) {
       errors.push(`Line ${rIdx + 1}: Expected ${headers.length} columns, found ${rawRow.length}.`);
     }
-    const rowObj = { obs_id: `row_${rIdx}` };
+    const rowObj = Object.assign(Object.create(null), {obs_id:`row_${rIdx}`});
     for (let cIdx = 0; cIdx < headers.length; cIdx++) {
       const colName = headers[cIdx];
       const cellStr = rawRow[cIdx] !== undefined ? rawRow[cIdx] : '';
@@ -347,7 +357,7 @@ export function parseDelimitedText(rawText, options = {}) {
   }
 
   return {
-    valid: rows.length > 0,
+    valid: rows.length > 0 && errors.length === 0,
     delimiter,
     headers,
     rows,
@@ -1122,6 +1132,18 @@ export function runTransformationPipeline(rawRows, rawHeaders, steps = []) {
  */
 export function parseDataSenseJSON(jsonString) {
   try {
+    assertInputSize(typeof jsonString === 'string' ? jsonString : JSON.stringify(jsonString));
+    const result = parseDataSenseJSONUnchecked(jsonString);
+    if (result.valid) {
+      assertHeaders(result.headers);
+      assertTableSize(result.rows.length, result.headers.length);
+      if (result.rows.some(row => result.headers.some(h => row[h] !== null && typeof row[h] === 'object'))) throw new Error('Nested values must be flattened into columns before import.');
+    }
+    return result;
+  } catch (error) { return {valid:false, error:error.message}; }
+}
+function parseDataSenseJSONUnchecked(jsonString) {
+  try {
     const parsed = typeof jsonString === 'string' ? JSON.parse(jsonString) : jsonString;
     if (!parsed || typeof parsed !== 'object') {
       return { valid: false, error: 'Invalid JSON payload.' };
@@ -1290,9 +1312,11 @@ export function parseDataSenseJSON(jsonString) {
 
     // 4. Standard DataSenseDataset v1.0.0 (Section E.1)
     if (Array.isArray(parsed.observations) && parsed.observations.length > 0) {
+      if (parsed.observations.some(row => !row || typeof row !== 'object' || Array.isArray(row))) throw new Error('Every observation must be an object with named columns.');
       const headers = Array.isArray(parsed.variables) && parsed.variables.length > 0
         ? parsed.variables.map(v => v.name)
-        : Object.keys(parsed.observations[0]).filter(k => k !== 'obs_id');
+        : [...new Set(parsed.observations.flatMap(row => Object.keys(row)))].filter(k => k !== 'obs_id');
+      if (parsed.observations.some(row => Object.keys(row).some(k => k !== 'obs_id' && !headers.includes(k)))) throw new Error('Some observation fields are missing from the variables list. Include all fields before importing.');
       const overrides = {};
       if (Array.isArray(parsed.variables)) {
         for (const v of parsed.variables) {

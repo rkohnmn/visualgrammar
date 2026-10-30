@@ -1,3 +1,6 @@
+import { assertInputSize } from './import-safety.js';
+let importGeneration = 0;
+import { trapDialogFocus } from "./dialog-focus.js";
 /**
  * VisualGrammar — Main Application Controller & State Coordinator (app.js)
  * Coordinates all 9 destinations, dataset state, variable overrides, transformation undo/redo,
@@ -274,6 +277,7 @@ function renderActiveViewCanvases() {
 // DATASET LOADING, PROFILING, & TRANSFORMATION PIPELINE
 // ============================================================================
 export function loadPresetDataset(presetId, notify = true) {
+  ++importGeneration;
   const preset = getPresetById(presetId);
   appState.isPreset = true;
   appState.datasetId = preset.id;
@@ -399,6 +403,7 @@ function wireGlobalNavigationAndHeader() {
 
   // Global keyboard shortcuts for Undo/Redo in Studio
   window.addEventListener('keydown', e => {
+    if (e.target instanceof Element && e.target.closest('input, textarea, select, [contenteditable="true"]')) return;
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
       if (e.shiftKey) {
         studioRedo();
@@ -2600,17 +2605,30 @@ function renderLearnLessonDetail() {
 // ============================================================================
 // UPLOAD / PASTE / JSON IMPORT MODAL
 // ============================================================================
+let uploadReturnFocus;
 function openUploadModal() {
+  uploadReturnFocus = document.activeElement;
+  const message = document.getElementById('upload-validation-msg');
+  if (message) { message.textContent = ''; message.style.display = 'none'; }
   const modal = document.getElementById('upload-modal-backdrop');
-  if (modal) modal.classList.add('open');
+  if (modal) { modal.classList.add('open'); document.getElementById('paste-dataset-title')?.focus(); }
 }
 
 function closeUploadModal() {
+  ++importGeneration;
   const modal = document.getElementById('upload-modal-backdrop');
   if (modal) modal.classList.remove('open');
+  uploadReturnFocus?.focus();
 }
 
+function showUploadError(message) {
+  const el = document.getElementById('upload-validation-msg');
+  el.textContent = message; el.className = 'callout callout-error'; el.style.display = 'flex';
+}
 function wireUploadModalEvents() {
+  document.getElementById('paste-raw-textarea')?.addEventListener('input', () => ++importGeneration);
+  const uploadModal = document.getElementById('upload-modal-backdrop');
+  uploadModal?.addEventListener('keydown', e => trapDialogFocus(e, uploadModal, closeUploadModal));
   document.getElementById('btn-open-upload-modal')?.addEventListener('click', openUploadModal);
   document.getElementById('btn-close-upload-modal')?.addEventListener('click', closeUploadModal);
 
@@ -2619,10 +2637,22 @@ function wireUploadModalEvents() {
     fileInput.addEventListener('change', () => {
       const file = fileInput.files && fileInput.files[0];
       if (!file) return;
+      const generation = ++importGeneration;
+      try { assertInputSize(file.size); } catch (error) { showUploadError(error.message); return; }
       const titleIn = document.getElementById('paste-dataset-title');
       if (titleIn) titleIn.value = file.name.replace(/\.[^.]+$/, '');
       const reader = new FileReader();
+      reader.onerror = () => {
+        if (generation !== importGeneration) return;
+        const message = document.getElementById('upload-validation-msg');
+        message.style.display = 'flex';
+        message.className = 'callout callout-error';
+        message.textContent = 'The file could not be read. Select it again or paste its contents below.';
+      };
       reader.onload = e => {
+        if (generation !== importGeneration) return;
+        const message = document.getElementById('upload-validation-msg');
+        message.textContent = ''; message.style.display = 'none';
         const text = String(e.target?.result || '');
         const area = document.getElementById('paste-raw-textarea');
         if (area) area.value = text;
@@ -2665,6 +2695,7 @@ function wireUploadModalEvents() {
   });
 
   document.getElementById('btn-confirm-import')?.addEventListener('click', () => {
+    ++importGeneration;
     const raw = (document.getElementById('paste-raw-textarea')?.value || '').trim();
     const title = (document.getElementById('paste-dataset-title')?.value || 'Custom Dataset').trim();
     const msgEl = document.getElementById('upload-validation-msg');
