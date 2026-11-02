@@ -1,3 +1,8 @@
+// Escape only at HTML rendering boundaries; retain original values in the data model.
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+
 import { assertInputSize } from './import-safety.js';
 let importGeneration = 0;
 import { trapDialogFocus } from "./dialog-focus.js";
@@ -714,7 +719,7 @@ function renderUnderstandDataView() {
     const taxOptions = Object.values(VARIABLE_TAXONOMY);
     tbody.innerHTML = prof.variables.map(v => {
       const selectHtml = `
-        <select class="var-type-override-select" data-var-name="${v.name}" aria-label="Override variable type for ${v.name}">
+        <select class="var-type-override-select" data-var-name="${escapeHtml(v.name)}" aria-label="Override variable type for ${escapeHtml(v.name)}">
           ${taxOptions.map(t => `<option value="${t.id}" ${t.id === v.inferredType ? 'selected' : ''}>${t.label}</option>`).join('')}
         </select>
       `;
@@ -732,26 +737,26 @@ function renderUnderstandDataView() {
       } else if (v.dateRange) {
         summaryHtml = `<span class="mono">Date Range: ${v.dateRange.start} → ${v.dateRange.end}</span>`;
       } else {
-        const topFreqs = v.frequencies.slice(0, 4).map(f => `${f.value} (${f.count})`).join(', ');
+        const topFreqs = v.frequencies.slice(0, 4).map(f => `${escapeHtml(f.value)} (${f.count})`).join(', ');
         summaryHtml = `<span>Top classes: ${topFreqs}</span>`;
       }
 
       return `
         <tr>
-          <td><strong>${v.name}</strong></td>
+          <td><strong>${escapeHtml(v.name)}</strong></td>
           <td>${selectHtml}</td>
-          <td><span class="badge">${v.physicalType}</span></td>
+          <td><span class="badge">${escapeHtml(v.physicalType)}</span></td>
           <td>
             <details class="inline-toggle">
-              <summary><span class="badge ${badgeClass}">${v.confidence}${v.isAmbiguous ? ' • Review' : ''}</span> <span>Why?</span></summary>
-              <div class="inline-toggle-body">${v.reasoning}</div>
+              <summary><span class="badge ${badgeClass}">${escapeHtml(v.confidence)}${v.isAmbiguous ? ' • Review' : ''}</span> <span>Why?</span></summary>
+              <div class="inline-toggle-body">${escapeHtml(v.reasoning)}</div>
             </details>
           </td>
           <td class="numeric">${v.nValid} / ${v.missingCount} (${v.missingPct.toFixed(1)}%)</td>
           <td class="numeric">${v.uniqueCount}</td>
           <td style="font-size:12px;">${summaryHtml}</td>
           <td>
-            <input type="text" class="var-unit-input" data-var-unit="${v.name}" value="${v.unit || ''}" placeholder="unit" style="width:70px; padding:4px 6px;" aria-label="Unit for ${v.name}">
+            <input type="text" class="var-unit-input" data-var-unit="${escapeHtml(v.name)}" value="${escapeHtml(v.unit || '')}" placeholder="unit" style="width:70px; padding:4px 6px;" aria-label="Unit for ${escapeHtml(v.name)}">
           </td>
         </tr>
       `;
@@ -783,7 +788,7 @@ function renderUnderstandDataView() {
   const colASel = document.getElementById('transform-col-a');
   const colBSel = document.getElementById('transform-col-b');
   if (colASel && colBSel) {
-    const opts = prof.headers.map(h => `<option value="${h}">${h}</option>`).join('');
+    const opts = prof.headers.map(h => `<option value="${escapeHtml(h)}">${escapeHtml(h)}</option>`).join('');
     colASel.innerHTML = opts;
     colBSel.innerHTML = opts;
     if (prof.headers.length > 1) colBSel.value = prof.headers[1];
@@ -797,7 +802,7 @@ function renderUnderstandDataView() {
       provBox.innerHTML = '<strong>Provenance Log:</strong> Original imported dataset active (0 transformations applied).';
     } else {
       provBox.innerHTML = `<strong>Provenance Lineage (${appState.provenanceLog.length} steps):</strong><br>` +
-        appState.provenanceLog.map(p => `${p.stepIndex}. ${p.description}`).join('<br>');
+        appState.provenanceLog.map(p => `${p.stepIndex}. ${escapeHtml(p.description)}`).join('<br>');
     }
   }
 
@@ -810,7 +815,7 @@ function renderDataPreviewTable(searchQuery = '') {
   if (!thead || !tbody || !appState.profile) return;
 
   const cols = appState.activeHeaders;
-  thead.innerHTML = `<tr><th>#</th>${cols.map(c => `<th>${c}</th>`).join('')}</tr>`;
+  thead.innerHTML = `<tr><th>#</th>${cols.map(c => `<th>${escapeHtml(c)}</th>`).join('')}</tr>`;
 
   const q = searchQuery.trim().toLowerCase();
   const filtered = q
@@ -821,7 +826,7 @@ function renderDataPreviewTable(searchQuery = '') {
     return `<tr><td class="numeric">${idx + 1}</td>${cols.map(c => {
       const v = r[c];
       const isNum = typeof v === 'number' && Number.isFinite(v);
-      return `<td class="${isNum ? 'numeric' : ''} editable-cell" data-obs-id="${r.obs_id || ''}" data-col-name="${c}" title="Double-click to edit cell value">${v === null || v === undefined ? '<span class="badge badge-warning">NULL</span>' : v}</td>`;
+      return `<td class="${isNum ? 'numeric' : ''} editable-cell" data-obs-id="${escapeHtml(r.obs_id || '')}" data-col-name="${escapeHtml(c)}" title="Double-click to edit cell value">${v === null || v === undefined ? '<span class="badge badge-warning">NULL</span>' : escapeHtml(v)}</td>`;
     }).join('')}</tr>`;
   }).join('');
 
@@ -927,8 +932,8 @@ function renderRecommendationsView() {
       const checked = appState.recSelectedVars.includes(v.name);
       return `
         <label class="badge ${checked ? 'badge-primary' : ''}" style="cursor:pointer;">
-          <input type="checkbox" class="rec-var-chk" value="${v.name}" ${checked ? 'checked' : ''}>
-          ${v.name} (${v.taxonomy.shortLabel})
+          <input type="checkbox" class="rec-var-chk" value="${escapeHtml(v.name)}" ${checked ? 'checked' : ''}>
+          ${escapeHtml(v.name)} (${v.taxonomy.shortLabel})
         </label>
       `;
     }).join('');
@@ -950,7 +955,7 @@ function renderRecommendationsView() {
 
   const banner = document.getElementById('rec-signature-banner');
   if (banner) {
-    banner.innerHTML = `<strong>Detected Data Structure Signature:</strong> ${recOut.structuralSummary}`;
+    banner.innerHTML = `<strong>Detected Data Structure Signature:</strong> ${escapeHtml(recOut.structuralSummary)}`;
   }
 
   const grid = document.getElementById('recommendations-grid');
@@ -980,14 +985,14 @@ function renderRecommendationsView() {
         </div>
 
         <div style="font-size:13px; display:flex; flex-direction:column; gap:6px;">
-          <div><strong>Suitability:</strong> ${r.whySuitable}</div>
+          <div><strong>Suitability:</strong> ${escapeHtml(r.whySuitable)}</div>
           <details class="collapsible-panel">
             <summary>Structure, Trade-Offs &amp; Alternatives</summary>
             <div class="collapsible-body" style="display:flex; flex-direction:column; gap:4px; font-size:12px;">
-              <div><strong>Required structure:</strong> ${r.requiredVariables}</div>
-              <div><strong>Transformations:</strong> ${r.requiredTransformations}</div>
-              <div><strong>Reveals:</strong> ${r.whatItReveals}</div>
-              <div><strong>May obscure:</strong> ${r.whatItObscures}</div>
+              <div><strong>Required structure:</strong> ${escapeHtml(r.requiredVariables)}</div>
+              <div><strong>Transformations:</strong> ${escapeHtml(r.requiredTransformations)}</div>
+              <div><strong>Reveals:</strong> ${escapeHtml(r.whatItReveals)}</div>
+              <div><strong>May obscure:</strong> ${escapeHtml(r.whatItObscures)}</div>
               <div><strong>When another is better:</strong> ${r.whenAnotherBetter}</div>
               <div><strong>Alternatives:</strong> ${r.alternatives.slice(0, 4).join(', ')}</div>
             </div>
@@ -1095,7 +1100,7 @@ function syncStudioControlsFromState() {
   const prof = appState.profile;
   if (!prof) return;
   const cols = prof.headers;
-  const reqOpts = cols.map(c => `<option value="${c}">${c} (${prof.variableMap[c]?.taxonomy.shortLabel || ''})</option>`).join('');
+  const reqOpts = cols.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)} (${prof.variableMap[c]?.taxonomy.shortLabel || ''})</option>`).join('');
   const optNone = `<option value="">— None —</option>` + reqOpts;
 
   const setSelectOptions = (id, html, val) => {
@@ -1355,10 +1360,10 @@ function handleCanvasHover(e, canvas, tooltipEl, hitRegions) {
     tooltipEl.style.display = 'block';
     tooltipEl.style.left = `${Math.min(rect.width - 240, Math.max(8, mx + 12))}px`;
     tooltipEl.style.top = `${Math.max(8, my - 36)}px`;
-    tooltipEl.innerHTML = `<strong>${matched.label}</strong><br>${matched.details}`;
+    tooltipEl.innerHTML = `<strong>${escapeHtml(matched.label)}</strong><br>${escapeHtml(matched.details)}`;
     const readout = document.getElementById('studio-live-readout');
     if (readout && !appState.selectedMarkLabel) {
-      readout.textContent = `${matched.label} — ${matched.details}`;
+      readout.textContent = `${escapeHtml(matched.label)} — ${escapeHtml(matched.details)}`;
     }
   } else {
     tooltipEl.style.display = 'none';
@@ -1370,7 +1375,7 @@ function handleCanvasClickSelect(e, canvas, hitRegions) {
   const readout = document.getElementById('studio-live-readout');
   if (matched) {
     appState.selectedMarkLabel = matched.label;
-    if (readout) readout.textContent = `Selected: ${matched.label} — ${matched.details}`;
+    if (readout) readout.textContent = `Selected: ${escapeHtml(matched.label)} — ${escapeHtml(matched.details)}`;
   } else {
     appState.selectedMarkLabel = null;
     if (readout) readout.textContent = 'Move pointer over chart or click a mark to select →';
@@ -1441,7 +1446,7 @@ function renderChartStudioWorkspace() {
   const keyInsp = document.getElementById('studio-keyboard-inspector');
   if (keyInsp) {
     keyInsp.innerHTML = `<option value="-1">Select mark (${appState.lastHitRegions.length} items)...</option>` +
-      appState.lastHitRegions.slice(0, 60).map((h, idx) => `<option value="${idx}">${h.label}</option>`).join('');
+      appState.lastHitRegions.slice(0, 60).map((h, idx) => `<option value="${idx}">${escapeHtml(h.label)}</option>`).join('');
   }
 
   // Update 3-Part Adaptive Interpretation Panel
@@ -1473,19 +1478,19 @@ function renderChartStudioWorkspace() {
         return `
           <div class="callout ${cls}">
             <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
-              <strong>${w.statement}</strong>
+              <strong>${escapeHtml(w.statement)}</strong>
               <span class="badge">${w.severity.toUpperCase()}</span>
             </div>
             <details class="collapsible-panel">
               <summary>Diagnostic Rationale &amp; Correction</summary>
               <div class="collapsible-body" style="font-size:12px; display:flex; flex-direction:column; gap:4px;">
-                <div><strong>Reason:</strong> ${w.reason}</div>
-                <div><strong>Effect:</strong> ${w.interpretiveEffect}</div>
-                <div><strong>Fix:</strong> ${w.suggestedCorrection}</div>
+                <div><strong>Reason:</strong> ${escapeHtml(w.reason)}</div>
+                <div><strong>Effect:</strong> ${escapeHtml(w.interpretiveEffect)}</div>
+                <div><strong>Fix:</strong> ${escapeHtml(w.suggestedCorrection)}</div>
               </div>
             </details>
             <div style="display:flex; gap:6px; margin-top:4px;">
-              ${w.autoFix ? `<button type="button" class="btn btn-primary btn-sm" data-autofix-idx="${idx}">⚡ ${w.autoFix.label}</button>` : ''}
+              ${w.autoFix ? `<button type="button" class="btn btn-primary btn-sm" data-autofix-idx="${idx}">⚡ ${escapeHtml(w.autoFix.label)}</button>` : ''}
               ${w.learnConceptId ? `<button type="button" class="btn btn-sm" data-learn-concept="${w.learnConceptId}">Read Concept →</button>` : ''}
             </div>
           </div>
@@ -1500,7 +1505,7 @@ function renderChartStudioWorkspace() {
             Object.assign(appState.chartConfig, w.autoFix.patch);
             syncStudioControlsFromState();
             renderChartStudioWorkspace();
-            showToast(`Applied integrity correction: ${w.autoFix.label}`);
+            showToast(`Applied integrity correction: ${escapeHtml(w.autoFix.label)}`);
           }
         });
       });
@@ -1527,7 +1532,7 @@ function renderStudioStatisticalSummaryTable(summaryData = {}) {
   if (summaryData.diag && summaryData.diag.valid) {
     const d = summaryData.diag;
     box.innerHTML = `
-      <div class="table-scroll">
+      <div class="table-scroll" tabindex="0">
         <table class="data-table" aria-label="OLS Regression Computer Output Table">
           <thead>
             <tr>
@@ -1568,7 +1573,7 @@ function renderStudioStatisticalSummaryTable(summaryData = {}) {
     `;
   } else if (summaryData.groupStats && summaryData.groupStats.length > 0) {
     box.innerHTML = `
-      <div class="table-scroll">
+      <div class="table-scroll" tabindex="0">
         <table class="data-table" aria-label="Grouped Distribution Summary Table">
           <thead>
             <tr>
@@ -1589,7 +1594,7 @@ function renderStudioStatisticalSummaryTable(summaryData = {}) {
               const s = g.stats;
               return `
                 <tr>
-                  <td><strong>${g.key}</strong></td>
+                  <td><strong>${escapeHtml(g.key)}</strong></td>
                   <td class="numeric">${s.n}</td>
                   <td class="numeric">${s.mean.toFixed(3)}</td>
                   <td class="numeric">${s.sd.toFixed(3)}</td>
@@ -1608,7 +1613,7 @@ function renderStudioStatisticalSummaryTable(summaryData = {}) {
     `;
   } else if (summaryData.items && summaryData.items.length > 0) {
     box.innerHTML = `
-      <div class="table-scroll">
+      <div class="table-scroll" tabindex="0">
         <table class="data-table" aria-label="Categorical Summary Equivalent Table">
           <thead>
             <tr>
@@ -1620,7 +1625,7 @@ function renderStudioStatisticalSummaryTable(summaryData = {}) {
           <tbody>
             ${summaryData.items.map(it => `
               <tr>
-                <td><strong>${it.key}</strong></td>
+                <td><strong>${escapeHtml(it.key)}</strong></td>
                 <td class="numeric">${it.n ?? '-'}</td>
                 <td class="numeric">${Number(it.value ?? it.est ?? 0).toFixed(3)}</td>
               </tr>
@@ -2606,8 +2611,8 @@ function renderLearnLessonDetail() {
 // UPLOAD / PASTE / JSON IMPORT MODAL
 // ============================================================================
 let uploadReturnFocus;
-function openUploadModal() {
-  uploadReturnFocus = document.activeElement;
+function openUploadModal(event) {
+  uploadReturnFocus = event?.currentTarget || (document.activeElement !== document.body ? document.activeElement : document.getElementById('btn-open-upload-modal'));
   const message = document.getElementById('upload-validation-msg');
   if (message) { message.textContent = ''; message.style.display = 'none'; }
   const modal = document.getElementById('upload-modal-backdrop');
@@ -2624,11 +2629,12 @@ function closeUploadModal() {
 function showUploadError(message) {
   const el = document.getElementById('upload-validation-msg');
   el.textContent = message; el.className = 'callout callout-error'; el.style.display = 'flex';
+  document.getElementById('paste-raw-textarea')?.focus();
 }
 function wireUploadModalEvents() {
   document.getElementById('paste-raw-textarea')?.addEventListener('input', () => ++importGeneration);
   const uploadModal = document.getElementById('upload-modal-backdrop');
-  uploadModal?.addEventListener('keydown', e => trapDialogFocus(e, uploadModal, closeUploadModal));
+  document.addEventListener('keydown', e => { if (uploadModal?.classList.contains('open')) trapDialogFocus(e, uploadModal, closeUploadModal); });
   document.getElementById('btn-open-upload-modal')?.addEventListener('click', openUploadModal);
   document.getElementById('btn-close-upload-modal')?.addEventListener('click', closeUploadModal);
 
@@ -2838,16 +2844,16 @@ function renderClassroomWorksheetModal() {
 
   body.innerHTML = `
     <div class="callout">
-      <strong>Dataset:</strong> ${appState.datasetTitle} (n = ${appState.activeRows.length} observational units) &nbsp;|&nbsp;
+      <strong>Dataset:</strong> ${escapeHtml(appState.datasetTitle)} (n = ${appState.activeRows.length} observational units) &nbsp;|&nbsp;
       <strong>Active Graphic:</strong> ${chart.name}<br>
-      <strong>Primary X Variable:</strong> ${xDesc}<br>
-      <strong>Secondary Y Variable:</strong> ${yDesc}
+      <strong>Primary X Variable:</strong> ${escapeHtml(xDesc)}<br>
+      <strong>Secondary Y Variable:</strong> ${escapeHtml(yDesc)}
     </div>
 
     <div class="card card-compact">
       <h4>Question 1 — Observational Units &amp; Semantic Variable Taxonomy</h4>
-      <p>Identify the observational unit in <em>${appState.datasetTitle}</em> and classify the statistical semantic types of the variables mapped to the horizontal and vertical axes. Why is physical storage type (string vs. number) insufficient to choose a valid visualization?</p>
-      ${showAns ? `<div class="callout callout-info"><strong>Instructor Rubric / Answer Key:</strong> Each row represents one observational unit in <em>${appState.datasetTitle}</em> (total n = ${appState.activeRows.length}). The X variable is <code>${xVar?.name || 'N/A'}</code> (${xVar?.taxonomy.label || 'N/A'}) and the Y mapping is <code>${yVar?.name || 'Aggregated Count/Density'}</code> (${yVar?.taxonomy.label || 'Derived summary'}). Physical storage is insufficient because numeric digits can encode nominal/geographic identifiers (such as ZIP codes or serial IDs) or binary 0/1 flags where arithmetic means and linear regression slopes are meaningless.</div>` : `<div style="height:54px; border-bottom:1px dashed var(--color-border);"></div>`}
+      <p>Identify the observational unit in <em>${escapeHtml(appState.datasetTitle)}</em> and classify the statistical semantic types of the variables mapped to the horizontal and vertical axes. Why is physical storage type (string vs. number) insufficient to choose a valid visualization?</p>
+      ${showAns ? `<div class="callout callout-info"><strong>Instructor Rubric / Answer Key:</strong> Each row represents one observational unit in <em>${escapeHtml(appState.datasetTitle)}</em> (total n = ${appState.activeRows.length}). The X variable is <code>${escapeHtml(xVar?.name || 'N/A')}</code> (${xVar?.taxonomy.label || 'N/A'}) and the Y mapping is <code>${escapeHtml(yVar?.name || 'Aggregated Count/Density')}</code> (${yVar?.taxonomy.label || 'Derived summary'}). Physical storage is insufficient because numeric digits can encode nominal/geographic identifiers (such as ZIP codes or serial IDs) or binary 0/1 flags where arithmetic means and linear regression slopes are meaningless.</div>` : `<div style="height:54px; border-bottom:1px dashed var(--color-border);"></div>`}
     </div>
 
     <div class="card card-compact">

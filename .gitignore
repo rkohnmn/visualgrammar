@@ -29,3 +29,7 @@ scratch/
 # Generated browser evidence
 artifacts/browser/
 __pycache__/
+
+artifacts/accessibility/
+
+_site/

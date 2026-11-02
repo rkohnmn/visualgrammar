@@ -42,3 +42,12 @@ The new parser regression cases exercise size limits, quoted records, and missin
 Chart-type eligibility remains in the existing engine. Saved chart configurations and transformations need broader schema validation; this pass is not a complete security or accessibility audit.
 
 Chromium checks do not replace Firefox/Safari, physical-device, screen-reader, comprehensive contrast, or performance testing. Imports are synchronous within the documented limits; no background-worker migration is claimed.
+
+
+## November 2, 2026 review follow-up
+
+Deployments now wait for reusable product validation in Chromium, Firefox and WebKit. The Chromium job also runs axe-core WCAG A/AA checks across the main workspaces in light and dark themes, plus keyboard-entry and 320-CSS-pixel reflow checks. axe-core is a pinned development dependency; run `npm ci --ignore-scripts` before `npm run test:a11y`. Failed browser journeys retain a screenshot and Playwright trace. Pages bundles contain public assets and documentation, excluding tests, browser artifacts and development packages.
+
+Automated audits do not certify screen-reader behavior, physical devices, every chart/dialog state, or complete WCAG conformance. Those remain manual validation tasks.
+
+Imported names, values, tooltips and worksheet fields are HTML-escaped at rendering boundaries. Derived arithmetic, standardization, bins, running totals and grouped summaries preserve missingness; missing running-total rows remain null without advancing the accumulator. WebKit import-dialog keyboard recovery is covered.

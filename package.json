@@ -1,13 +1,14 @@
 {
   "name": "visualgrammar",
   "version": "1.0.0",
-  "description": "VisualGrammar — Interactive Laboratory for Statistical Data Visualization, Variable Taxonomy, Chart Discovery, and Graphical Literacy",
+  "description": "VisualGrammar \u2014 Interactive Laboratory for Statistical Data Visualization, Variable Taxonomy, Chart Discovery, and Graphical Literacy",
   "type": "module",
   "scripts": {
     "test": "node --test tests/*.test.js",
     "verify": "node scripts/run-verify.js",
     "check": "npm run test && npm run verify",
-    "test:browser": "python tests/browser/test_product.py"
+    "test:browser": "python tests/browser/test_product.py",
+    "test:a11y": "python tests/browser/test_accessibility.py"
   },
   "keywords": [
     "statistics",
@@ -16,5 +17,8 @@
     "chart-literacy",
     "datasense-studio"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "axe-core": "4.10.3"
+  }
 }

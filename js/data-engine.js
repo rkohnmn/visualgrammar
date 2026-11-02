@@ -902,12 +902,12 @@ export function applyTransformationStep(datasetState, step) {
     case 'standardize_z': {
       const { column } = step;
       if (!clonedHeaders.includes(column)) return datasetState;
-      const stats = computeUnivariateStats(clonedRows.map(r => r[column]));
+      const stats = computeUnivariateStats(clonedRows.map(r => missingNumber(r[column])));
       if (!stats.valid || stats.sd <= EPSILON) return datasetState;
       const newCol = `${column}_z`;
       const nextHeaders = clonedHeaders.includes(newCol) ? clonedHeaders : [...clonedHeaders, newCol];
       const nextRows = clonedRows.map(r => {
-        const v = Number(r[column]);
+        const v = missingNumber(r[column]);
         return {
           ...r,
           [newCol]: Number.isFinite(v) ? Number(((v - stats.mean) / stats.sd).toFixed(5)) : null
@@ -927,7 +927,7 @@ export function applyTransformationStep(datasetState, step) {
       const nextHeaders = clonedHeaders.includes(newCol) ? clonedHeaders : [...clonedHeaders, newCol];
       let invalidCount = 0;
       const nextRows = clonedRows.map(r => {
-        const v = Number(r[column]);
+        const v = missingNumber(r[column]);
         if (!Number.isFinite(v) || v <= 0) {
           invalidCount++;
           return { ...r, [newCol]: null };
@@ -949,28 +949,29 @@ export function applyTransformationStep(datasetState, step) {
       const nextHeaders = clonedHeaders.includes(newCol) ? clonedHeaders : [...clonedHeaders, newCol];
       let running = 0;
       const nextRows = clonedRows.map(r => {
-        const v = Number(r[column]);
-        if (Number.isFinite(v)) running += v;
+        const v = missingNumber(r[column]);
+        if (!Number.isFinite(v)) return { ...r, [newCol]: null };
+        running += v;
         return { ...r, [newCol]: Number(running.toFixed(4)) };
       });
       return {
         rows: nextRows,
         headers: nextHeaders,
-        description: `Computed cumulative running total "${newCol}" from "${column}".`
+        description: `Computed cumulative running total "${newCol}" from "${column}"; missing rows stay missing and do not advance the total.`
       };
     }
 
     case 'binning': {
       const { column, bins = 5 } = step;
       if (!clonedHeaders.includes(column)) return datasetState;
-      const stats = computeUnivariateStats(clonedRows.map(r => r[column]));
+      const stats = computeUnivariateStats(clonedRows.map(r => missingNumber(r[column])));
       if (!stats.valid || stats.isConstant) return datasetState;
       const k = Math.max(2, Math.min(20, Number(bins) || 5));
       const width = (stats.max - stats.min) / k;
       const newCol = `${column}_bin`;
       const nextHeaders = clonedHeaders.includes(newCol) ? clonedHeaders : [...clonedHeaders, newCol];
       const nextRows = clonedRows.map(r => {
-        const v = Number(r[column]);
+        const v = missingNumber(r[column]);
         if (!Number.isFinite(v)) return { ...r, [newCol]: null };
         const idx = Math.min(k - 1, Math.max(0, Math.floor((v - stats.min) / width)));
         const low = (stats.min + idx * width).toFixed(2);
@@ -1006,7 +1007,7 @@ export function applyTransformationStep(datasetState, step) {
       return {
         rows: nextRows,
         headers: nextHeaders,
-        description: `Extracted calendar ${part} into "${newCol}" from "${column}".`
+        description: `Extracted calendar ${part} into "${newCol}" from "${column}"; missing rows stay missing and do not advance the total.`
       };
     }
 
@@ -1016,8 +1017,8 @@ export function applyTransformationStep(datasetState, step) {
       const outCol = (newName && String(newName).trim()) || `${colA}_${operation}_${colB}`;
       const nextHeaders = clonedHeaders.includes(outCol) ? clonedHeaders : [...clonedHeaders, outCol];
       const nextRows = clonedRows.map(r => {
-        const a = Number(r[colA]);
-        const b = Number(r[colB]);
+        const a = missingNumber(r[colA]);
+        const b = missingNumber(r[colB]);
         if (!Number.isFinite(a) || !Number.isFinite(b)) return { ...r, [outCol]: null };
         let res = null;
         if (operation === 'sum') res = a + b;
@@ -1060,7 +1061,7 @@ export function applyTransformationStep(datasetState, step) {
         if (aggFunc === 'relative_frequency') val = Number(relFreq.toFixed(4));
         else if (aggFunc === 'percentage') val = Number((relFreq * 100).toFixed(2));
         else if (targetColumn && clonedHeaders.includes(targetColumn)) {
-          const stats = computeUnivariateStats(gRows.map(x => x[targetColumn]));
+          const stats = computeUnivariateStats(gRows.map(x => missingNumber(x[targetColumn])));
           if (stats.valid) {
             if (aggFunc === 'sum') val = Number(stats.sum.toFixed(4));
             else if (aggFunc === 'mean') val = Number(stats.mean.toFixed(4));

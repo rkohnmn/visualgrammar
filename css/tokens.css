@@ -5,10 +5,10 @@
 
 :root {
   /* Color Roles — Light Mode (Warm Archival Grid Paper) */
-  --color-primary: #0F6E56;
+  --color-primary: #0C604B;
   --color-primary-hover: #0B5542;
   --color-primary-soft: rgba(15, 110, 86, 0.12);
-  --color-secondary: #D9381E;
+  --color-secondary: #B52D18;
   --color-secondary-soft: rgba(217, 56, 30, 0.12);
   --color-surface: #FFFFFF;
   --color-surface-elevated: #FAF9F5;
@@ -17,11 +17,11 @@
   --color-text-muted: #525866;
   --color-border: #D8D4C8;
   --color-border-strong: #B8B2A2;
-  --color-error: #C92A2A;
+  --color-error: #A61C1C;
   --color-error-bg: rgba(201, 42, 42, 0.09);
-  --color-warning: #B45309;
+  --color-warning: #92400E;
   --color-warning-bg: rgba(180, 83, 9, 0.10);
-  --color-success: #0F6E56;
+  --color-success: #0C604B;
   --color-success-bg: rgba(15, 110, 86, 0.10);
   --color-accent-highlight: #1D4ED8;
   --color-accent-soft: rgba(29, 78, 216, 0.10);
@@ -30,10 +30,10 @@
   --color-grid-minor: #F0EDE4;
 
   /* Colorblind-Safe Categorical Palette (Okabe-Ito / DataSense Harmonized) */
-  --palette-cat-1: #0F6E56;
-  --palette-cat-2: #D9381E;
+  --palette-cat-1: #0C604B;
+  --palette-cat-2: #B52D18;
   --palette-cat-3: #1D4ED8;
-  --palette-cat-4: #B45309;
+  --palette-cat-4: #92400E;
   --palette-cat-5: #7C3AED;
   --palette-cat-6: #0891B2;
   --palette-cat-7: #BE185D;

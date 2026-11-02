@@ -58,3 +58,5 @@
 .import-feedback:empty { display: none; }
 .import-feedback[data-state="loading"], .import-feedback[data-state="success"] { border-left-color: var(--color-primary); }
 .import-error[data-state="loading"] { color: var(--color-text-muted); }
+
+[data-theme="dark"] .badge-info { color: #BFDBFE; }
