@@ -681,9 +681,18 @@ function handleApplyTransformation() {
   }
 
   if (step) {
+    const oldRedo = appState.transformRedoStack;
     appState.transformations.push(step);
     appState.transformRedoStack = [];
-    recomputeDatasetPipeline();
+    try {
+      recomputeDatasetPipeline();
+    } catch (error) {
+      appState.transformations.pop();
+      appState.transformRedoStack = oldRedo;
+      recomputeDatasetPipeline();
+      showToast(`Transformation rejected: ${error.message}`);
+      return;
+    }
     refreshAllViews();
     showToast(`Applied transformation: ${step.type}`);
   }

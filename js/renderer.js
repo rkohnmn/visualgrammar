@@ -370,13 +370,13 @@ function renderCategorical1D(ctx, rows, profile, config, env) {
   for (const r of rows) {
     const k = r[xCol];
     if (k === null || k === undefined || k === '') continue;
+    // Percentages must use the rows contributing to the plotted statistic.
+    const rawY = yCol ? r[yCol] : null;
+    if (yCol && (rawY === null || rawY === undefined || rawY === '' ||
+                 typeof rawY === 'boolean' || !Number.isFinite(Number(rawY)))) continue;
     const key = String(k);
     if (!groups.has(key)) groups.set(key, []);
-    if (yCol && Number.isFinite(Number(r[yCol]))) {
-      groups.get(key).push(Number(r[yCol]));
-    } else if (!yCol) {
-      groups.get(key).push(1);
-    }
+    groups.get(key).push(yCol ? Number(rawY) : 1);
     totalValid++;
   }
 
@@ -547,6 +547,24 @@ function renderCategorical1D(ctx, rows, profile, config, env) {
 // ============================================================================
 // 2. CATEGORICAL 2D (Grouped Bar, Stacked Bar, 100% Stacked Bar)
 // ============================================================================
+/** Preserve all category mass when charts display a limited color legend. */
+export function collapseContingencyColorLevels(ct, maxLevels = 8) {
+  const source = ct.colLevels || [];
+  const omitted = source.length > maxLevels ? source.slice(maxLevels - 1) : [];
+  const levels = omitted.length
+    ? [...source.slice(0, maxLevels - 1), `Other (${omitted.length} categories)`]
+    : [...source];
+  return {
+    levels,
+    getCount(rowKey, level) {
+      if (omitted.length && level === levels[levels.length - 1]) {
+        return omitted.reduce((sum, key) => sum + (ct.counts[rowKey]?.[key] || 0), 0);
+      }
+      return ct.counts[rowKey]?.[level] || 0;
+    }
+  };
+}
+
 function renderCategorical2D(ctx, rows, profile, config, env) {
   const { margin, plotW, plotH, tokens, palette, hitRegions } = env;
   const chartType = config.chartType;
@@ -561,13 +579,15 @@ function renderCategorical2D(ctx, rows, profile, config, env) {
     return { ct };
   }
 
+  const colorSeries = collapseContingencyColorLevels(ct, 8);
   const is100 = chartType === 'bar_stacked_100';
   const isStacked = chartType === 'bar_stacked' || is100;
   const maxVal = is100
     ? 100
     : isStacked
       ? Math.max(...Object.values(ct.rowTotals), 1) * 1.12
-      : Math.max(...ct.cells.map(c => c.count), 1) * 1.15;
+      : Math.max(1, ...ct.rowLevels.flatMap(rowKey =>
+          colorSeries.levels.map(level => colorSeries.getCount(rowKey, level)))) * 1.15;
 
   const yLabel = is100 ? 'Row Conditional Percentage (%)' : (yCol ? `Sum(${yCol})` : 'Observation Count (n)');
   drawCartesianFrame(ctx, margin, plotW, plotH, tokens, `${xCol} (by ${colorCol})`, yLabel);
@@ -583,7 +603,7 @@ function renderCategorical2D(ctx, rows, profile, config, env) {
   }
 
   const rLevels = ct.rowLevels.slice(0, 12);
-  const cLevels = ct.colLevels.slice(0, 8);
+  const cLevels = colorSeries.levels;
   const groupStep = plotW / rLevels.length;
 
   rLevels.forEach((rKey, rIdx) => {
@@ -596,7 +616,7 @@ function renderCategorical2D(ctx, rows, profile, config, env) {
       let cumVal = 0;
 
       cLevels.forEach((cKey, cIdx) => {
-        const rawCount = ct.counts[rKey][cKey] || 0;
+        const rawCount = colorSeries.getCount(rKey, cKey);
         const val = is100 ? (rTot > 0 ? (rawCount / rTot) * 100 : 0) : rawCount;
         const yBottom = margin.top + plotH - (cumVal / maxVal) * plotH;
         const yTop = margin.top + plotH - ((cumVal + val) / maxVal) * plotH;
@@ -630,7 +650,7 @@ function renderCategorical2D(ctx, rows, profile, config, env) {
       const startX = groupX + (groupStep - clusterW) / 2;
 
       cLevels.forEach((cKey, cIdx) => {
-        const rawCount = ct.counts[rKey][cKey] || 0;
+        const rawCount = colorSeries.getCount(rKey, cKey);
         const h = (rawCount / maxVal) * plotH;
         const bx = startX + cIdx * subW;
         const by = margin.top + plotH - h;
@@ -2496,7 +2516,13 @@ function renderPartToWhole(ctx, rows, profile, config, env) {
   rows.forEach(r => {
     const k = r[xCol];
     if (k === null || k === undefined || k === '') return;
-    const w = yCol && Number.isFinite(Number(r[yCol])) ? Math.max(0, Number(r[yCol])) : 1;
+    let w = 1;
+    if (yCol) {
+      const rawY = r[yCol];
+      if (rawY === null || rawY === undefined || rawY === '' || typeof rawY === 'boolean') return;
+      w = Number(rawY);
+      if (!Number.isFinite(w) || w <= 0) return;
+    }
     const key = String(k);
     groups.set(key, (groups.get(key) || 0) + w);
     grandTotal += w;
