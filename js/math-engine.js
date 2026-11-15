@@ -407,8 +407,13 @@ export function computeHistogram(rawValues, options = {}) {
   const customEdges = options.binEdges;
 
   let edges = [];
-  if (Array.isArray(customEdges) && customEdges.length >= 2) {
-    edges = [...customEdges].sort((a, b) => a - b);
+  if (customEdges !== undefined) {
+    if (!Array.isArray(customEdges) || customEdges.length < 2 ||
+        !customEdges.every(Number.isFinite) ||
+        customEdges.some((edge, i) => i > 0 && edge <= customEdges[i - 1])) {
+      return { valid: false, bins: [], n: 0, totalArea: 0, reason: 'Histogram edges must be finite and strictly increasing.' };
+    }
+    edges = [...customEdges];
   } else {
     let binCount = options.binCount ? Math.max(1, Math.min(100, Math.round(options.binCount))) : null;
     if (!binCount) {
@@ -476,7 +481,11 @@ export function computeHistogram(rawValues, options = {}) {
     }
   }
 
-  const denom = includedCount > 0 ? includedCount : n;
+  if (includedCount === 0) {
+    return { valid: false, n: 0, bins, edges, totalArea: 0, totalRelFreq: 0,
+      reason: 'No observations fall within the requested histogram edges.' };
+  }
+  const denom = includedCount;
   let totalArea = 0;
   let totalRelFreq = 0;
   for (let k = 0; k < numBins; k++) {
@@ -640,7 +649,14 @@ export function computeContingencyTable(rows, rowVar, colVar, weightVar = null) 
     if (rv === null || rv === undefined || rv === '' || cv === null || cv === undefined || cv === '') {
       continue;
     }
-    const w = weightVar && Number.isFinite(Number(r[weightVar])) ? Math.max(0, Number(r[weightVar])) : 1;
+    let w = 1;
+    if (weightVar) {
+      const rawWeight = r[weightVar];
+      if (rawWeight === null || rawWeight === undefined || rawWeight === '' || typeof rawWeight === 'boolean') continue;
+      w = Number(rawWeight);
+      // Missing, invalid, and negative numeric weights must never become count=1.
+      if (!Number.isFinite(w) || w <= 0) continue;
+    }
     const rKey = String(rv);
     const cKey = String(cv);
     rowLevelsSet.add(rKey);
@@ -650,13 +666,13 @@ export function computeContingencyTable(rows, rowVar, colVar, weightVar = null) 
 
   const rowLevels = Array.from(rowLevelsSet);
   const colLevels = Array.from(colLevelsSet);
-  const counts = {};
-  const rowTotals = {};
-  const colTotals = {};
+  const counts = Object.create(null);
+  const rowTotals = Object.create(null);
+  const colTotals = Object.create(null);
   let grandTotal = 0;
 
   for (const rKey of rowLevels) {
-    counts[rKey] = {};
+    counts[rKey] = Object.create(null);
     rowTotals[rKey] = 0;
     for (const cKey of colLevels) {
       counts[rKey][cKey] = 0;

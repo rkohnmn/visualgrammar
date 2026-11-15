@@ -242,77 +242,9 @@ function parseDelimitedTextUnchecked(rawText, options = {}) {
 
   const cleanText = rawText.replace(/^\uFEFF/, '').trim();
 
-  let delimiter = options.delimiter || null;
-  if (!delimiter) {
-    const firstLineEnd = cleanText.indexOf('\n');
-    const firstLine = firstLineEnd >= 0 ? cleanText.slice(0, firstLineEnd) : cleanText;
-    const tabCount = (firstLine.match(/\t/g) || []).length;
-    const commaCount = (firstLine.match(/,/g) || []).length;
-    const semiCount = (firstLine.match(/;/g) || []).length;
-    if (tabCount > commaCount && tabCount >= semiCount) delimiter = '\t';
-    else if (semiCount > commaCount) delimiter = ';';
-    else delimiter = ',';
-  }
-
-  const records = [];
-  let currentRecord = [];
-  let currentField = '';
-  let inQuotes = false;
-  let i = 0;
-  const len = cleanText.length;
-
-  while (i < len) {
-    const ch = cleanText[i];
-    if (inQuotes) {
-      if (ch === '"') {
-        if (i + 1 < len && cleanText[i + 1] === '"') {
-          currentField += '"';
-          i += 2;
-          continue;
-        } else {
-          inQuotes = false;
-          i++;
-          continue;
-        }
-      } else {
-        currentField += ch;
-        i++;
-        continue;
-      }
-    } else {
-      if (ch === '"') {
-        inQuotes = true;
-        i++;
-        continue;
-      }
-      if (ch === delimiter) {
-        currentRecord.push(currentField.trim());
-        currentField = '';
-        i++;
-        continue;
-      }
-      if (ch === '\r' || ch === '\n') {
-        if (ch === '\r' && i + 1 < len && cleanText[i + 1] === '\n') {
-          i++;
-        }
-        currentRecord.push(currentField.trim());
-        if (currentRecord.some(cell => cell !== '')) {
-          records.push(currentRecord);
-        }
-        currentRecord = [];
-        currentField = '';
-        i++;
-        continue;
-      }
-      currentField += ch;
-      i++;
-    }
-  }
-  if (inQuotes) throw new Error('Unclosed quotation mark. Close the quoted field before importing.');
-  currentRecord.push(currentField.trim());
-  if (currentRecord.some(cell => cell !== '')) {
-    records.push(currentRecord);
-  }
+  // Reuse the strict RFC-style parser shared with the rest of the application.
+  // The previous local parser accepted quotes mid-field and trailing text after a quote.
+  const { records, delimiter } = readDelimitedRecords(cleanText, options.delimiter || null);
 
   if (records.length < 2) {
     return {
@@ -1037,7 +969,17 @@ export function applyTransformationStep(datasetState, step) {
 
     case 'group_aggregate': {
       const { groupColumn, targetColumn, aggFunc = 'mean' } = step;
-      if (!clonedHeaders.includes(groupColumn)) return datasetState;
+      if (!clonedHeaders.includes(groupColumn)) {
+        throw new Error(`Grouping column "${groupColumn}" does not exist.`);
+      }
+      const countFunctions = ['count', 'relative_frequency', 'percentage'];
+      const numericFunctions = ['sum', 'mean', 'median', 'min', 'max', 'sd'];
+      if (![...countFunctions, ...numericFunctions].includes(aggFunc)) {
+        throw new Error(`Unsupported aggregation: ${aggFunc}`);
+      }
+      if (numericFunctions.includes(aggFunc) && (!targetColumn || !clonedHeaders.includes(targetColumn))) {
+        throw new Error(`Aggregation "${aggFunc}" requires an existing numeric target column.`);
+      }
       const groups = new Map();
       let validTotal = 0;
       for (const r of clonedRows) {
